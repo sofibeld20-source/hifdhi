@@ -1,0 +1,13 @@
+
+{
+  "name": "حِفْظِي - HIFDHI",
+  "short_name": "حِفْظِي",
+  "description": "رحلتك مع القرآن الكريم والحفظ والمراجعة",
+  "lang": "ar",
+  "dir": "rtl",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#0b1220",
+  "theme_color": "#0b1220"
+}

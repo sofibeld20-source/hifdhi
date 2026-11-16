@@ -1,12 +1,21 @@
+
 import { useEffect, useMemo, useRef, useState } from "react";
 import {
   BookOpen, Brain, Headphones, Home, Search, Bookmark,
   Flame, Target, ChevronLeft, Menu, X, Sparkles, Moon,
   BookmarkCheck, ArrowRight, Play, Check, RotateCcw,
   Volume2, CircleCheck, GraduationCap, Eye, EyeOff,
-  Lightbulb, Trophy, Zap
+  Lightbulb, Trophy, Zap, Download, Wifi, WifiOff
 } from "lucide-react";
 import "./App.css";
+
+import {
+  saveSurahOffline,
+  getSurahOffline,
+  getDownloadedSurahs,
+  saveAudioOffline,
+  getAudioOffline,
+} from "./offline";
 
 const API = "https://ummahapi.com/api";
 const TOTAL_AYAHS = 6236;
@@ -79,7 +88,16 @@ function App() {
   const [mobileMenu, setMobileMenu] = useState(false);
   const [search, setSearch] = useState("");
 
-  const [surahs, setSurahs] = useState([]);
+  const [downloadedSurahs, setDownloadedSurahs] = useState([]);
+  const [downloadingSurah, setDownloadingSurah] = useState(null);
+  const [offlineMessage, setOfflineMessage] = useState("");
+  const [isOnline, setIsOnline] = useState(
+    typeof navigator !== "undefined" ? navigator.onLine : true
+  );
+
+  const [surahs, setSurahs] = useState(() =>
+    readStorage("hifdhi-surahs-list", [])
+  );
   const [selectedSurah, setSelectedSurah] = useState(null);
   const [ayahs, setAyahs] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -120,6 +138,7 @@ function App() {
 
   // Audio player
   const audioRef = useRef(null);
+  const audioObjectUrlRef = useRef("");
   const [listenSurah, setListenSurah] = useState("1");
   const [listenAyah, setListenAyah] = useState(1);
   const [reciter, setReciter] = useState("ar.alafasy");
@@ -142,7 +161,10 @@ function App() {
   }, [readingHistory]);
 
   useEffect(() => {
-    localStorage.setItem("hifdhi-smart-completed", JSON.stringify(smartCompleted));
+    localStorage.setItem(
+      "hifdhi-smart-completed",
+      JSON.stringify(smartCompleted)
+    );
   }, [smartCompleted]);
 
   useEffect(() => {
@@ -152,15 +174,53 @@ function App() {
     );
   }, [smartFinishedAyahs]);
 
+  // Online/offline status and IndexedDB
+  useEffect(() => {
+    const updateOnlineStatus = () => {
+      setIsOnline(navigator.onLine);
+    };
+
+    window.addEventListener("online", updateOnlineStatus);
+    window.addEventListener("offline", updateOnlineStatus);
+
+    getDownloadedSurahs()
+      .then(setDownloadedSurahs)
+      .catch((error) => console.error("Offline storage error:", error));
+
+    return () => {
+      window.removeEventListener("online", updateOnlineStatus);
+      window.removeEventListener("offline", updateOnlineStatus);
+
+      if (audioObjectUrlRef.current) {
+        URL.revokeObjectURL(audioObjectUrlRef.current);
+      }
+    };
+  }, []);
+
   // Load surahs
   useEffect(() => {
     fetchSurahs();
   }, []);
 
   async function fetchSurahs() {
-    try {
-      setApiError("");
+    const storageKey = "hifdhi-surahs-list";
+    const cachedList = readStorage(storageKey, []);
 
+    if (Array.isArray(cachedList) && cachedList.length > 0) {
+      setSurahs(cachedList);
+      setApiError("");
+    }
+
+    if (!navigator.onLine) {
+      if (!cachedList.length) {
+        setApiError(
+          "قائمة السور غير متاحة. اتصلي بالإنترنت مرة واحدة لتحميلها."
+        );
+      }
+      return;
+    }
+
+    try {
       const response = await fetch(`${API}/quran/surahs`);
 
       if (!response.ok) {
@@ -176,15 +236,19 @@ function App() {
         result?.results ||
         [];
 
-      if (!Array.isArray(list)) {
+      if (!Array.isArray(list) || list.length === 0) {
         throw new Error("صيغة البيانات غير متوقعة");
       }
 
       setSurahs(list);
+      localStorage.setItem(storageKey, JSON.stringify(list));
+      setApiError("");
     } catch {
-      setApiError(
-        "ما قدرناش نحمّلو قائمة السور. تأكدي من اتصال الإنترنت وحاولي مجددًا."
-      );
+      if (!cachedList.length) {
+        setApiError(
+          "ما قدرناش نحمّلو قائمة السور. تأكدي من اتصال الإنترنت وحاولي مجددًا."
+        );
+      }
     }
   }
 
@@ -210,13 +274,8 @@ function App() {
   }
 
   function getActivityStreak() {
-    const keys = Object.keys(readingHistory).sort().reverse();
-
-    if (!keys.length) return 0;
-
     const today = new Date();
     const yesterday = new Date();
-
     yesterday.setDate(today.getDate() - 1);
 
     let cursor = new Date(todayKey());
@@ -225,7 +284,6 @@ function App() {
       if (!readingHistory[yesterday.toLocaleDateString("en-CA")]) {
         return 0;
       }
-
       cursor = yesterday;
     }
 
@@ -233,7 +291,6 @@ function App() {
 
     while (true) {
       const key = cursor.toLocaleDateString("en-CA");
-
       if (!readingHistory[key]) break;
 
       streak++;
@@ -253,10 +310,115 @@ function App() {
     return numbers.size;
   }, [readingHistory]);
 
-  // Open a surah
-  async function openSurah(surah) {
+  // Load surah verses from IndexedDB first, then API
+  async function loadSurahVerses(number) {
+    const offlineData = await getSurahOffline(number);
+
+    if (offlineData?.verses?.length) {
+      return offlineData.verses;
+    }
+
+    if (!navigator.onLine) {
+      throw new Error(
+        "هذه السورة غير محمّلة على جهازك. اتصلي بالإنترنت وحمّليها أولًا."
+      );
+    }
+
+    const response = await fetch(
+      `${API}/quran/surah/${number}?script=uthmani`
+    );
+
+    if (!response.ok) {
+      throw new Error("تعذر تحميل السورة");
+    }
+
+    const result = await response.json();
+    const verses = extractVerses(result);
+
+    if (!Array.isArray(verses) || verses.length === 0) {
+      throw new Error("لم يتم العثور على آيات");
+    }
+
+    const surah = surahs.find(
+      (item) => getSurahNumber(item) === Number(number)
+    );
+
+    await saveSurahOffline(
+      number,
+      getSurahName(surah),
+      verses
+    );
+
+    setDownloadedSurahs(await getDownloadedSurahs());
+
+    return verses;
+  }
+
+  // Download a surah manually
+  async function downloadSurah(surah) {
+    const number = getSurahNumber(surah);
+    if (!number) return;
+
+    setDownloadingSurah(number);
+    setOfflineMessage("");
+
+    try {
+      const existing = await getSurahOffline(number);
+
+      if (existing?.verses?.length) {
+        setDownloadedSurahs(await getDownloadedSurahs());
+        setOfflineMessage(
+          `${getSurahName(surah)} محفوظة بالفعل على جهازك.`
+        );
+        return;
+      }
+
+      if (!navigator.onLine) {
+        throw new Error(
+          "لا يوجد اتصال بالإنترنت لتحميل سورة جديدة."
+        );
+      }
+
+      const response = await fetch(
+        `${API}/quran/surah/${number}?script=uthmani`
+      );
+
+      if (!response.ok) {
+        throw new Error("تعذر تحميل السورة");
+      }
+
+      const result = await response.json();
+      const verses = extractVerses(result);
+
+      if (!Array.isArray(verses) || verses.length === 0) {
+        throw new Error("لم يتم العثور على آيات");
+      }
+
+      await saveSurahOffline(number, getSurahName(surah), verses);
+
+      setDownloadedSurahs(await getDownloadedSurahs());
+      setOfflineMessage(
+        `تم تحميل ${getSurahName(surah)} للاستعمال دون إنترنت.`
+      );
+    } catch (error) {
+      setOfflineMessage(
+        error.message || "تعذر تحميل السورة. حاولي مرة أخرى."
+      );
+    } finally {
+      setDownloadingSurah(null);
+    }
+  }
+
+  function isSurahDownloaded(surah) {
     const number = getSurahNumber(surah);
 
+    return downloadedSurahs.some(
+      (item) => Number(item.number) === number
+    );
+  }
+
+  async function openSurah(surah) {
+    const number = getSurahNumber(surah);
     if (!number) return;
 
     setSelectedSurah(surah);
@@ -266,23 +428,14 @@ function App() {
     setApiError("");
 
     try {
-      const response = await fetch(
-        `${API}/quran/surah/${number}?script=uthmani`
-      );
-
-      if (!response.ok) throw new Error("تعذر تحميل السورة");
-
-      const result = await response.json();
-      const verses = extractVerses(result);
-
-      if (!Array.isArray(verses)) {
-        throw new Error("لم يتم العثور على الآيات");
-      }
+      const verses = await loadSurahVerses(number);
 
       setAyahs(verses);
       recordActivity(number);
-    } catch {
-      setApiError("تعذر تحميل آيات السورة. حاولي مرة أخرى.");
+    } catch (error) {
+      setApiError(
+        error.message || "تعذر تحميل آيات السورة. حاولي مرة أخرى."
+      );
     } finally {
       setLoading(false);
     }
@@ -291,11 +444,9 @@ function App() {
   // Saved ayahs
   function toggleSaved(ayah, index, surah = selectedSurah) {
     const surahNumber = getSurahNumber(surah);
-
     const ayahNumber = Number(
       ayah?.number || ayah?.number_in_surah || index + 1
     );
-
     const key = `${surahNumber}:${ayahNumber}`;
 
     setSavedAyahs((previous) => {
@@ -320,7 +471,6 @@ function App() {
 
   function isSaved(ayah, index, surah = selectedSurah) {
     const surahNumber = getSurahNumber(surah);
-
     const ayahNumber = Number(
       ayah?.number || ayah?.number_in_surah || index + 1
     );
@@ -333,11 +483,9 @@ function App() {
   // Mark memorized
   function markAyahMemorized(ayah, index, surah = selectedSurah) {
     const surahNumber = getSurahNumber(surah);
-
     const ayahNumber = Number(
       ayah?.number || ayah?.number_in_surah || index + 1
     );
-
     const key = `${surahNumber}:${ayahNumber}`;
 
     setMemorizedAyahs((previous) => {
@@ -351,7 +499,6 @@ function App() {
   // Memorization practice
   async function startPractice(surah) {
     const number = getSurahNumber(surah);
-
     if (!number) return;
 
     setPracticeSurah(number);
@@ -360,23 +507,18 @@ function App() {
     setPracticeAyahs([]);
     setPracticeLoading(true);
     setActive("memorize");
+    setApiError("");
 
     try {
-      const response = await fetch(
-        `${API}/quran/surah/${number}?script=uthmani`
-      );
-
-      if (!response.ok) throw new Error("تعذر تحميل السورة");
-
-      const result = await response.json();
-      const verses = extractVerses(result);
-
-      if (!Array.isArray(verses)) throw new Error("لا توجد آيات");
+      const verses = await loadSurahVerses(number);
 
       setPracticeAyahs(verses);
       recordActivity(number);
-    } catch {
-      setApiError("تعذر تحميل آيات التدريب. حاولي مرة أخرى.");
+    } catch (error) {
+      setApiError(
+        error.message || "تعذر تحميل آيات التدريب. حاولي مرة أخرى."
+      );
+      setPracticeSurah("");
     } finally {
       setPracticeLoading(false);
     }
@@ -384,7 +526,6 @@ function App() {
 
   function markPracticeMemorized() {
     const ayah = practiceAyahs[practiceIndex];
-
     if (!ayah) return;
 
     const key = `${practiceSurah}:${Number(
@@ -402,7 +543,6 @@ function App() {
     setPracticeIndex((index) =>
       Math.min(index + 1, practiceAyahs.length - 1)
     );
-
     setShowPracticeAnswer(false);
   }
 
@@ -411,10 +551,9 @@ function App() {
     setShowPracticeAnswer(false);
   }
 
-  // SMART HIFDH
+  // Smart Hifdh
   async function startSmartPractice(surah) {
     const number = getSurahNumber(surah);
-
     if (!number) return;
 
     setSmartSurah(number);
@@ -426,29 +565,22 @@ function App() {
     setApiError("");
 
     try {
-      const response = await fetch(
-        `${API}/quran/surah/${number}?script=uthmani`
-      );
-
-      if (!response.ok) throw new Error("تعذر تحميل السورة");
-
-      const result = await response.json();
-      const verses = extractVerses(result);
-
-      if (!Array.isArray(verses) || verses.length === 0) {
-        throw new Error("لا توجد آيات");
-      }
+      const verses = await loadSurahVerses(number);
 
       setSmartAyahs(verses);
       recordActivity(number);
-    } catch {
-      setApiError("تعذر تحميل آيات الحفظ الذكي. حاولي مرة أخرى.");
+    } catch (error) {
+      setApiError(
+        error.message || "تعذر تحميل آيات الحفظ الذكي. حاولي مرة أخرى."
+      );
+      setSmartSurah("");
     } finally {
       setSmartLoading(false);
     }
   }
 
   const currentSmartAyah = smartAyahs[smartIndex];
+
   const smartWords = currentSmartAyah
     ? getAyahText(currentSmartAyah).trim().split(/\s+/).filter(Boolean)
     : [];
@@ -461,7 +593,6 @@ function App() {
       Math.max(1, smartWords.length - 1)
     );
 
-    // Select words at regular intervals so the exercise is repeatable.
     const indexes = [];
     const step = smartWords.length / (count + 1);
 
@@ -536,7 +667,7 @@ function App() {
     setRevealedWords([]);
   }
 
-  // Audio player functions
+  // Audio player
   function getListenSurah() {
     return surahs.find(
       (surah) => getSurahNumber(surah) === Number(listenSurah)
@@ -555,32 +686,86 @@ function App() {
     );
   }
 
+  function setAudioSource(url) {
+    if (audioObjectUrlRef.current) {
+      URL.revokeObjectURL(audioObjectUrlRef.current);
+      audioObjectUrlRef.current = "";
+    }
+
+    if (url.startsWith("blob:")) {
+      audioObjectUrlRef.current = url;
+    }
+
+    setAudioUrl(url);
+  }
+
   async function playListenAyah(
     surahNumber = listenSurah,
     ayahNumber = listenAyah,
     selectedReciter = reciter
   ) {
+    const audioKey =
+      `${Number(surahNumber)}:${Number(ayahNumber)}:${selectedReciter}`;
+
     try {
       setAudioLoading(true);
       setAudioError("");
       setAudioPlaying(false);
+      setListenSurah(String(surahNumber));
+      setListenAyah(Number(ayahNumber));
+
+      // First try locally saved audio
+      const cachedAudio = await getAudioOffline(audioKey);
+
+      if (cachedAudio?.blob) {
+        const localUrl = URL.createObjectURL(cachedAudio.blob);
+        setAudioSource(localUrl);
+        return;
+      }
+
+      if (!navigator.onLine) {
+        throw new Error(
+          "هذه التلاوة غير محفوظة على جهازك. اتصلي بالإنترنت وشغّليها أولًا."
+        );
+      }
 
       const response = await fetch(
         `https://api.alquran.cloud/v1/ayah/${Number(surahNumber)}:${Number(ayahNumber)}/${selectedReciter}`
       );
 
-      if (!response.ok) throw new Error("Audio request failed");
+      if (!response.ok) {
+        throw new Error("تعذر الحصول على التلاوة");
+      }
 
       const result = await response.json();
-      const url = result?.data?.audio;
+      const remoteUrl = result?.data?.audio;
 
-      if (!url) throw new Error("Audio not found");
+      if (!remoteUrl) {
+        throw new Error("لم يتم العثور على الملف الصوتي");
+      }
 
-      setListenSurah(String(surahNumber));
-      setListenAyah(Number(ayahNumber));
-      setAudioUrl(url);
-    } catch {
+      let finalUrl = remoteUrl;
+
+      // Try caching audio for future offline playback
+      try {
+        const audioResponse = await fetch(remoteUrl);
+
+        if (audioResponse.ok) {
+          const audioBlob = await audioResponse.blob();
+
+          if (audioBlob.size > 0) {
+            await saveAudioOffline(audioKey, audioBlob);
+            finalUrl = URL.createObjectURL(audioBlob);
+          }
+        }
+      } catch (storageError) {
+        console.warn("Audio could not be cached:", storageError);
+      }
+
+      setAudioSource(finalUrl);
+    } catch (error) {
       setAudioError(
+        error.message ||
         "ما قدرناش نشغلو التلاوة. تأكدي من الإنترنت وحاولي مرة أخرى."
       );
     } finally {
@@ -617,7 +802,7 @@ function App() {
   function changeListenSurah(number) {
     setListenSurah(number);
     setListenAyah(1);
-    setAudioUrl("");
+    setAudioSource("");
     setAudioError("");
     setAudioPlaying(false);
   }
@@ -655,6 +840,7 @@ function App() {
     setMobileMenu(false);
     setSearch("");
     setApiError("");
+    setOfflineMessage("");
   }
 
   const smartSurahName =
@@ -666,7 +852,6 @@ function App() {
 
   return (
     <div className="app" dir="rtl">
-
       {mobileMenu && (
         <button
           className="mobile-overlay"
@@ -710,7 +895,6 @@ function App() {
               >
                 <Icon size={19} />
                 <span>{item.label}</span>
-
                 {active === item.id && (
                   <span className="nav-active-dot" />
                 )}
@@ -735,7 +919,6 @@ function App() {
 
       {/* MAIN */}
       <main className="main">
-
         <header className="topbar">
           <div className="topbar-start">
             <button
@@ -753,10 +936,26 @@ function App() {
           </div>
 
           <div className="topbar-badge">
-            <span className="online-dot" />
-            رحلة إيمانية يومية
+            {isOnline ? (
+              <Wifi size={15} className="online-dot" />
+            ) : (
+              <WifiOff size={15} />
+            )}
+            {isOnline ? "متصل بالإنترنت" : "وضع دون إنترنت"}
           </div>
         </header>
+
+        {offlineMessage && (
+          <div className="error-message">
+            <span>{offlineMessage}</span>
+            <button
+              onClick={() => setOfflineMessage("")}
+              aria-label="إغلاق الرسالة"
+            >
+              <X size={16} />
+            </button>
+          </div>
+        )}
 
         {apiError && (
           <div className="error-message">
@@ -796,11 +995,9 @@ function App() {
               <div className="hero-decoration">
                 <div className="hero-orbit orbit-one" />
                 <div className="hero-orbit orbit-two" />
-
                 <div className="hero-book">
                   <BookOpen size={76} strokeWidth={1.1} />
                 </div>
-
                 <Sparkles className="hero-sparkle sparkle-one" size={22} />
                 <Sparkles className="hero-sparkle sparkle-two" size={16} />
               </div>
@@ -849,12 +1046,14 @@ function App() {
                   <span className="section-kicker">إنجاز الحفظ</span>
                   <h3>رحلتك نحو إتمام حفظ القرآن</h3>
                 </div>
-
                 <div className="progress-percent">{progress}%</div>
               </div>
 
               <div className="progress-track">
-                <div className="progress-fill" style={{ width: `${progress}%` }} />
+                <div
+                  className="progress-fill"
+                  style={{ width: `${progress}%` }}
+                />
               </div>
 
               <div className="progress-bottom">
@@ -913,7 +1112,10 @@ function App() {
               </div>
 
               {selectedSurah && (
-                <button className="back-button" onClick={() => setSelectedSurah(null)}>
+                <button
+                  className="back-button"
+                  onClick={() => setSelectedSurah(null)}
+                >
                   <ChevronLeft size={17} />
                   قائمة السور
                 </button>
@@ -930,7 +1132,9 @@ function App() {
                     placeholder="ابحث عن سورة..."
                   />
                   {search && (
-                    <button onClick={() => setSearch("")}><X size={17} /></button>
+                    <button onClick={() => setSearch("")}>
+                      <X size={17} />
+                    </button>
                   )}
                 </div>
 
@@ -943,33 +1147,62 @@ function App() {
                   <div className="surah-grid">
                     {filteredSurahs.map((surah, index) => {
                       const number = getSurahNumber(surah) || index + 1;
+                      const downloaded = isSurahDownloaded(surah);
 
                       return (
-                        <button
-                          className="surah-card"
-                          key={number}
-                          onClick={() => openSurah(surah)}
-                        >
-                          <span className="surah-number">{number}</span>
-                          <span className="surah-info">
-                            <strong>{getSurahName(surah)}</strong>
-                            <small>
-                              {surah.name_english ||
-                                surah.nameEnglish ||
-                                surah.english_name ||
-                                `السورة رقم ${number}`}
-                            </small>
-                          </span>
-                          <BookOpen size={19} className="surah-book-icon" />
-                        </button>
+                        <div className="surah-card" key={number}>
+                          <button
+                            className="surah-card-open"
+                            onClick={() => openSurah(surah)}
+                          >
+                            <span className="surah-number">{number}</span>
+                            <span className="surah-info">
+                              <strong>{getSurahName(surah)}</strong>
+                              <small>
+                                {surah.name_english ||
+                                  surah.nameEnglish ||
+                                  surah.english_name ||
+                                  `السورة رقم ${number}`}
+                              </small>
+                            </span>
+                            <BookOpen size={19} className="surah-book-icon" />
+                          </button>
+
+                          <button
+                            className="surah-download-button"
+                            onClick={() => downloadSurah(surah)}
+                            disabled={
+                              downloadingSurah === number || downloaded
+                            }
+                            title={
+                              downloaded
+                                ? "محفوظة دون إنترنت"
+                                : "تحميل السورة"
+                            }
+                          >
+                            {downloadingSurah === number ? (
+                              <span className="audio-mini-loader" />
+                            ) : downloaded ? (
+                              <CircleCheck size={18} />
+                            ) : (
+                              <Download size={18} />
+                            )}
+                          </button>
+                        </div>
                       );
                     })}
                   </div>
                 )}
 
                 {filteredSurahs.length === 0 && surahs.length > 0 && (
-                  <div className="empty-state">ما لقيناش سورة بهذا الاسم.</div>
+                  <div className="empty-state">
+                    ما لقيناش سورة بهذا الاسم.
+                  </div>
                 )}
+
+                <div className="section-note">
+                  السور المحمّلة على جهازك: {downloadedSurahs.length}
+                </div>
               </>
             ) : (
               <div className="mushaf-container">
@@ -1000,14 +1233,15 @@ function App() {
                         );
 
                         const saved = isSaved(ayah, index);
-
                         const memorized = memorizedAyahs.includes(
                           `${getSurahNumber(selectedSurah)}:${ayahNumber}`
                         );
 
                         return (
                           <span className="ayah-inline" key={ayahNumber}>
-                            <span className="ayah-text">{getAyahText(ayah)}</span>
+                            <span className="ayah-text">
+                              {getAyahText(ayah)}
+                            </span>
 
                             <span className="ayah-actions">
                               <button
@@ -1034,7 +1268,9 @@ function App() {
                     </div>
 
                     {ayahs.length === 0 && !loading && (
-                      <div className="empty-state">لا توجد آيات لعرضها.</div>
+                      <div className="empty-state">
+                        لا توجد آيات لعرضها.
+                      </div>
                     )}
                   </>
                 )}
@@ -1052,13 +1288,14 @@ function App() {
                 <h2>الحفظ والمراجعة</h2>
                 <p>اختر سورة، اقرأ الآية، ثم حاول استرجاعها من ذاكرتك.</p>
               </div>
-
               <div className="memorize-title-icon"><Brain size={27} /></div>
             </div>
 
             {!practiceSurah ? (
               <div className="practice-start-card">
-                <div className="practice-start-icon"><GraduationCap size={36} /></div>
+                <div className="practice-start-icon">
+                  <GraduationCap size={36} />
+                </div>
                 <h3>ابدأ جلسة الحفظ</h3>
                 <p>اختر السورة التي تريد مراجعتها، وسنرافقك آية بآية.</p>
 
@@ -1092,21 +1329,31 @@ function App() {
                   <div>
                     <span className="section-kicker">جلسة المراجعة</span>
                     <h3>
-                      {surahs.find((s) => getSurahNumber(s) === Number(practiceSurah))
+                      {surahs.find(
+                        (s) => getSurahNumber(s) === Number(practiceSurah)
+                      )
                         ? getSurahName(
-                            surahs.find((s) => getSurahNumber(s) === Number(practiceSurah))
+                            surahs.find(
+                              (s) => getSurahNumber(s) === Number(practiceSurah)
+                            )
                           )
                         : `سورة رقم ${practiceSurah}`}
                     </h3>
                   </div>
 
-                  <button className="back-button" onClick={() => setPracticeSurah("")}>
+                  <button
+                    className="back-button"
+                    onClick={() => setPracticeSurah("")}
+                  >
                     تغيير السورة
                   </button>
                 </div>
 
                 {practiceLoading ? (
-                  <div className="loading-state"><div className="loader" />جارٍ تحضير جلسة الحفظ...</div>
+                  <div className="loading-state">
+                    <div className="loader" />
+                    جارٍ تحضير جلسة الحفظ...
+                  </div>
                 ) : practiceAyahs.length > 0 ? (
                   <>
                     <div className="practice-progress">
@@ -1118,7 +1365,9 @@ function App() {
                           }}
                         />
                       </div>
-                      <span>الآية {practiceIndex + 1} من {practiceAyahs.length}</span>
+                      <span>
+                        الآية {practiceIndex + 1} من {practiceAyahs.length}
+                      </span>
                     </div>
 
                     <div className="practice-ayah-box">
@@ -1137,13 +1386,19 @@ function App() {
 
                     <div className="practice-actions">
                       {!showPracticeAnswer ? (
-                        <button className="primary-button" onClick={() => setShowPracticeAnswer(true)}>
+                        <button
+                          className="primary-button"
+                          onClick={() => setShowPracticeAnswer(true)}
+                        >
                           <BookOpen size={17} />
                           إظهار الآية
                         </button>
                       ) : (
                         <>
-                          <button className="secondary-button" onClick={() => setShowPracticeAnswer(false)}>
+                          <button
+                            className="secondary-button"
+                            onClick={() => setShowPracticeAnswer(false)}
+                          >
                             <RotateCcw size={17} />
                             أخفي الآية
                           </button>
@@ -1151,7 +1406,9 @@ function App() {
                           <button
                             className="primary-button"
                             onClick={markPracticeMemorized}
-                            disabled={practiceIndex === practiceAyahs.length - 1}
+                            disabled={
+                              practiceIndex === practiceAyahs.length - 1
+                            }
                           >
                             <Check size={17} />
                             حفظتها، التالي
@@ -1160,22 +1417,28 @@ function App() {
                       )}
                     </div>
 
-                    {practiceIndex === practiceAyahs.length - 1 && showPracticeAnswer && (
-                      <div className="practice-complete">
-                        <CircleCheck size={17} />
-                        وصلتِ إلى آخر آية في هذه السورة.
-                      </div>
-                    )}
+                    {practiceIndex === practiceAyahs.length - 1 &&
+                      showPracticeAnswer && (
+                        <div className="practice-complete">
+                          <CircleCheck size={17} />
+                          وصلتِ إلى آخر آية في هذه السورة.
+                        </div>
+                      )}
 
                     {practiceIndex === practiceAyahs.length - 1 && (
-                      <button className="secondary-button" onClick={resetPractice}>
+                      <button
+                        className="secondary-button"
+                        onClick={resetPractice}
+                      >
                         <RotateCcw size={17} />
                         إعادة المراجعة من البداية
                       </button>
                     )}
                   </>
                 ) : (
-                  <div className="empty-state">لم نتمكن من تحميل آيات هذه السورة.</div>
+                  <div className="empty-state">
+                    لم نتمكن من تحميل آيات هذه السورة.
+                  </div>
                 )}
               </div>
             )}
@@ -1214,7 +1477,6 @@ function App() {
               <div className="smart-intro-icon">
                 <Brain size={31} />
               </div>
-
               <div>
                 <h3>تعلّم بالتذكّر النشط</h3>
                 <p>
@@ -1255,7 +1517,10 @@ function App() {
                   <BookOpen size={29} />
                 </div>
 
-                <label className="smart-setting-label" htmlFor="smart-hidden-count">
+                <label
+                  className="smart-setting-label"
+                  htmlFor="smart-hidden-count"
+                >
                   عدد الكلمات المخفية
                 </label>
 
@@ -1263,7 +1528,9 @@ function App() {
                   id="smart-hidden-count"
                   className="smart-select"
                   value={smartHiddenCount}
-                  onChange={(event) => setSmartHiddenCount(Number(event.target.value))}
+                  onChange={(event) =>
+                    setSmartHiddenCount(Number(event.target.value))
+                  }
                 >
                   <option value={2}>كلمتان - سهل</option>
                   <option value={3}>3 كلمات - متوسط</option>
@@ -1322,7 +1589,8 @@ function App() {
                     <div className="loader" />
                     جارٍ تحضير التمرين...
                   </div>
-                ) : smartIndex >= smartAyahs.length && smartAyahs.length > 0 ? (
+                ) : smartIndex >= smartAyahs.length &&
+                  smartAyahs.length > 0 ? (
                   <div className="smart-finish">
                     <div className="smart-finish-icon">
                       <Trophy size={42} />
@@ -1334,7 +1602,10 @@ function App() {
                     </p>
 
                     <div className="smart-finish-actions">
-                      <button className="primary-button" onClick={restartSmartPractice}>
+                      <button
+                        className="primary-button"
+                        onClick={restartSmartPractice}
+                      >
                         <RotateCcw size={17} />
                         إعادة التدريب
                       </button>
@@ -1386,7 +1657,11 @@ function App() {
                               key={`${index}-${word}`}
                               className={
                                 isHidden
-                                  ? `smart-word ${isRevealed ? "smart-word-revealed" : "smart-word-hidden"}`
+                                  ? `smart-word ${
+                                      isRevealed
+                                        ? "smart-word-revealed"
+                                        : "smart-word-hidden"
+                                    }`
                                   : "smart-word"
                               }
                             >
@@ -1420,9 +1695,7 @@ function App() {
 
                     <div className="smart-hint">
                       <EyeOff size={17} />
-                      <span>
-                        الكلمات المخفية: {hiddenWordIndexes.length}
-                      </span>
+                      <span>الكلمات المخفية: {hiddenWordIndexes.length}</span>
                       <span className="smart-hint-divider">·</span>
                       <span>
                         المتبقي: {hiddenWordIndexes.length - revealedCount}
@@ -1486,8 +1759,9 @@ function App() {
                 <h2>الآيات المحفوظة</h2>
                 <p>الآيات التي أضفتِها إلى قائمتك للرجوع إليها لاحقًا.</p>
               </div>
-
-              <div className="memorize-title-icon"><BookmarkCheck size={27} /></div>
+              <div className="memorize-title-icon">
+                <BookmarkCheck size={27} />
+              </div>
             </div>
 
             {savedAyahs.length === 0 ? (
@@ -1498,7 +1772,10 @@ function App() {
                   عندما تجدين آية تريدين الاحتفاظ بها،
                   اضغطي على علامة الحفظ بجانبها.
                 </p>
-                <button className="primary-button" onClick={() => changePage("quran")}>
+                <button
+                  className="primary-button"
+                  onClick={() => changePage("quran")}
+                >
                   <BookOpen size={17} />
                   تصفحي القرآن
                 </button>
@@ -1508,12 +1785,16 @@ function App() {
                 {savedAyahs.map((item) => (
                   <div className="saved-ayah-card" key={item.key}>
                     <div className="saved-card-top">
-                      <span>{item.surahName} · الآية {item.ayahNumber}</span>
+                      <span>
+                        {item.surahName} · الآية {item.ayahNumber}
+                      </span>
                       <button
                         className="remove-saved"
                         onClick={() =>
                           setSavedAyahs((previous) =>
-                            previous.filter((saved) => saved.key !== item.key)
+                            previous.filter(
+                              (saved) => saved.key !== item.key
+                            )
                           )
                         }
                         title="إزالة من المحفوظات"
@@ -1528,7 +1809,8 @@ function App() {
                       className="text-button"
                       onClick={() => {
                         const surah = surahs.find(
-                          (s) => getSurahNumber(s) === item.surahNumber
+                          (s) =>
+                            getSurahNumber(s) === item.surahNumber
                         );
 
                         if (surah) openSurah(surah);
@@ -1554,8 +1836,9 @@ function App() {
                 <h2>الاستماع إلى القرآن</h2>
                 <p>اختر السورة والقارئ، واستمتع بتلاوة القرآن الكريم.</p>
               </div>
-
-              <div className="memorize-title-icon"><Headphones size={27} /></div>
+              <div className="memorize-title-icon">
+                <Headphones size={27} />
+              </div>
             </div>
 
             <div className="audio-player-card">
@@ -1580,7 +1863,9 @@ function App() {
                   <span>اختيار السورة</span>
                   <select
                     value={listenSurah}
-                    onChange={(event) => changeListenSurah(event.target.value)}
+                    onChange={(event) =>
+                      changeListenSurah(event.target.value)
+                    }
                   >
                     {surahs.map((surah, index) => {
                       const number = getSurahNumber(surah) || index + 1;
@@ -1608,7 +1893,9 @@ function App() {
                     }}
                   >
                     {reciters.map((item) => (
-                      <option key={item.id} value={item.id}>{item.name}</option>
+                      <option key={item.id} value={item.id}>
+                        {item.name}
+                      </option>
                     ))}
                   </select>
                 </label>
@@ -1635,7 +1922,9 @@ function App() {
                 />
               </div>
 
-              {audioError && <div className="audio-error">{audioError}</div>}
+              {audioError && (
+                <div className="audio-error">{audioError}</div>
+              )}
 
               <audio
                 ref={audioRef}
@@ -1665,7 +1954,9 @@ function App() {
                         audioRef.current.pause();
                       } else {
                         audioRef.current.play().catch(() => {
-                          setAudioError("تعذر تشغيل الصوت. حاولي مجددًا.");
+                          setAudioError(
+                            "تعذر تشغيل الصوت. حاولي مجددًا."
+                          );
                         });
                       }
                     } else {
@@ -1687,10 +1978,15 @@ function App() {
                 <button
                   className="audio-skip-button"
                   onClick={nextListenAyah}
-                  disabled={listenAyah >= getListenAyahCount() || audioLoading}
+                  disabled={
+                    listenAyah >= getListenAyahCount() || audioLoading
+                  }
                   title="الآية التالية"
                 >
-                  <ChevronLeft size={22} className="next-audio-icon" />
+                  <ChevronLeft
+                    size={22}
+                    className="next-audio-icon"
+                  />
                 </button>
               </div>
 
