@@ -5,7 +5,7 @@ import {
   Flame, Target, ChevronLeft, Menu, X, Sparkles, Moon,
   BookmarkCheck, ArrowRight, Play, Check, RotateCcw,
   Volume2, CircleCheck, GraduationCap, Eye, EyeOff,
-  Lightbulb, Trophy, Zap, Download, Wifi, WifiOff
+  Lightbulb, Trophy, Zap, Download, Wifi, WifiOff, Heart, PenLine, Map, Gift, CalendarDays, Send, RefreshCw
 } from "lucide-react";
 import "./App.css";
 
@@ -27,6 +27,11 @@ const menu = [
   { id: "smart", label: "الحفظ الذكي", icon: Zap },
   { id: "listen", label: "الاستماع", icon: Headphones },
   { id: "saved", label: "الآيات المحفوظة", icon: Bookmark },
+  { id: "daily", label: "آية اليوم", icon: CalendarDays },
+  { id: "heart", label: "رسالة لقلبك", icon: Heart },
+  { id: "challenge", label: "تحدي التطبيق", icon: Gift },
+  { id: "journal", label: "بصمتي القرآنية", icon: PenLine },
+  { id: "journey", label: "خريطة رحلتي", icon: Map },
 ];
 
 const reciters = [
@@ -82,6 +87,34 @@ function extractVerses(result) {
     []
   );
 }
+
+const dailyVerses = [
+  { surah: 2, ayah: 286, title: "رحمة الله وسعة رحمته", meaning: "يطمئننا الله أن تكاليفه لا تتجاوز طاقة الإنسان، وأن لكل نفس جزاء ما كسبت، ثم يعلّمنا دعاءً نلجأ به إليه." },
+  { surah: 13, ayah: 28, title: "طمأنينة القلب", meaning: "تجد القلوب سكينتها الحقيقية في ذكر الله، والرجوع إليه والثقة بوعده." },
+  { surah: 94, ayah: 5, title: "مع العسر يسر", meaning: "يبشّر الله عباده بأن الشدة لا تدوم، وأن اليسر يصاحب العسر ويأتي بعده." },
+  { surah: 39, ayah: 53, title: "باب الأمل مفتوح", meaning: "ينهى الله عباده عن اليأس من رحمته، ويدعوهم إلى الرجوع إليه مهما عظمت ذنوبهم." },
+  { surah: 14, ayah: 7, title: "الشكر يزيد النعم", meaning: "وعد الله من يشكره بالزيادة، وفي الآية تذكير بقيمة الاعتراف بالنعم واستعمالها في الخير." },
+  { surah: 3, ayah: 173, title: "حسبنا الله", meaning: "تعلّمنا الآية أن المؤمن يواجه التخويف بالتوكل على الله والثقة بكفايته ونصره." },
+  { surah: 93, ayah: 3, title: "لست متروكًا", meaning: "في سياق السورة تسلية للنبي ﷺ وتأكيد أن ربه لم يتركه ولم يبغضه." },
+];
+
+const heartGuides = {
+  "قلق": { label: "عندما يزدحم قلبك بالقلق", surah: 13, ayah: 28, meaning: "تذكّر أن ذكر الله باب للسكينة، وخذ بالأسباب مع تفويض ما لا تملك إلى الله.", action: "خذ دقيقة هادئة، وردّد ذكرًا تعرفه بتأنٍ، ثم اكتب خطوة صغيرة تستطيع القيام بها الآن." },
+  "حزن": { label: "عندما يثقل عليك الحزن", surah: 94, ayah: 5, meaning: "تذكّر وعد الله بأن مع العسر يسرًا، وأن الضيق ليس نهاية الطريق.", action: "امنح نفسك وقتًا، وتواصل مع شخص تثق به، وابدأ بأمر يسير يخفف عنك." },
+  "خوف": { label: "عندما تشعر بالخوف", surah: 3, ayah: 173, meaning: "تدعونا الآية إلى التوكل على الله والثقة بأنه نعم الوكيل.", action: "سمِّ ما تخافه بوضوح، وخذ بالأسباب الممكنة، واستعن بالله في ما لا تستطيع التحكم فيه." },
+  "أمل": { label: "عندما تبحث عن الأمل", surah: 39, ayah: 53, meaning: "لا يغلق الله باب رحمته في وجه من يرجع إليه؛ فلا تجعل التعثر سببًا لليأس.", action: "ابدأ من جديد بخطوة واحدة، ولو كانت صغيرة جدًا." },
+  "امتنان": { label: "عندما يمتلئ قلبك امتنانًا", surah: 14, ayah: 7, meaning: "الشكر اعتراف بالنعمة بالقلب واللسان والعمل، وهو سبب للزيادة والبركة.", action: "اكتب ثلاث نعم، واختر نعمة واحدة تشكر الله عليها بعمل صالح." },
+};
+
+const dailyChallenges = [
+  { title: "برّ الوالدين", description: "اتصل بأحد والديك أو قدّم لهما مساعدة أو كلمة طيبة بنية البر.", value: "الإحسان" },
+  { title: "صدقة خفية", description: "قدّم مساعدة بسيطة لمحتاج، ولو بابتسامة أو كلمة طيبة.", value: "الرحمة" },
+  { title: "الصبر عند الغضب", description: "إذا استفزك موقف اليوم، تمهّل قبل الرد واختر الكلمة الأحسن.", value: "الصبر" },
+  { title: "صلة الرحم", description: "اسأل عن قريب لم تتواصل معه منذ مدة.", value: "الصلة" },
+  { title: "ورد من القرآن", description: "اقرأ صفحة بتأنٍ، وحاول أن تتوقف عند معنى واحد تعمل به.", value: "التدبر" },
+  { title: "كلمة طيبة", description: "اختر شخصًا وقل له كلمة صادقة ترفع معنوياته.", value: "الإحسان" },
+  { title: "العفو", description: "اترك جدالًا لا فائدة منه، أو سامح في أمر تستطيع تجاوزه.", value: "العفو" },
+];
 
 function App() {
   const [active, setActive] = useState("home");
@@ -146,6 +179,76 @@ function App() {
   const [audioLoading, setAudioLoading] = useState(false);
   const [audioError, setAudioError] = useState("");
   const [audioPlaying, setAudioPlaying] = useState(false);
+  const [dailyAyah, setDailyAyah] = useState(null);
+  const [dailyLoading, setDailyLoading] = useState(false);
+  const [selectedEmotion, setSelectedEmotion] = useState("");
+  const [heartAyah, setHeartAyah] = useState(null);
+  const [heartLoading, setHeartLoading] = useState(false);
+  const [challengeDone, setChallengeDone] = useState(() => readStorage("hifdhi-challenge-done", {}));
+  const [journalEntries, setJournalEntries] = useState(() => readStorage("hifdhi-reflections", []));
+  const [journalVerse, setJournalVerse] = useState("");
+  const [journalLearning, setJournalLearning] = useState("");
+  const [journalAction, setJournalAction] = useState("");
+
+  const todayChallenge = dailyChallenges[Math.floor(new Date().setHours(0,0,0,0) / 86400000) % dailyChallenges.length];
+  const todayDailyVerse = dailyVerses[Math.floor(new Date().setHours(0,0,0,0) / 86400000) % dailyVerses.length];
+
+  useEffect(() => {
+    localStorage.setItem("hifdhi-challenge-done", JSON.stringify(challengeDone));
+  }, [challengeDone]);
+
+  useEffect(() => {
+    localStorage.setItem("hifdhi-reflections", JSON.stringify(journalEntries));
+  }, [journalEntries]);
+
+  async function fetchFeatureAyah(surahNumber, ayahNumber) {
+    const response = await fetch(`https://api.alquran.cloud/v1/ayah/${surahNumber}:${ayahNumber}`);
+    if (!response.ok) throw new Error("تعذر تحميل الآية. تحقّق من اتصال الإنترنت.");
+    const result = await response.json();
+    if (result?.code !== 200 || !result?.data?.text) throw new Error("لم نتمكن من العثور على الآية.");
+    return result.data;
+  }
+
+  useEffect(() => {
+    let cancelled = false;
+    setDailyLoading(true);
+    fetchFeatureAyah(todayDailyVerse.surah, todayDailyVerse.ayah)
+      .then((data) => { if (!cancelled) setDailyAyah(data); })
+      .catch(() => { if (!cancelled) setDailyAyah(null); })
+      .finally(() => { if (!cancelled) setDailyLoading(false); });
+    return () => { cancelled = true; };
+  }, []);
+
+  async function chooseEmotion(emotion) {
+    setSelectedEmotion(emotion);
+    setHeartAyah(null);
+    setHeartLoading(true);
+    try {
+      const guide = heartGuides[emotion];
+      const data = await fetchFeatureAyah(guide.surah, guide.ayah);
+      setHeartAyah(data);
+    } catch (error) {
+      setOfflineMessage(error.message);
+    } finally {
+      setHeartLoading(false);
+    }
+  }
+
+  function saveReflection(event) {
+    event.preventDefault();
+    if (!journalLearning.trim() && !journalAction.trim()) return;
+    const entry = {
+      id: Date.now(),
+      date: new Date().toLocaleDateString("ar-DZ"),
+      verse: journalVerse.trim(),
+      learning: journalLearning.trim(),
+      action: journalAction.trim(),
+    };
+    setJournalEntries((previous) => [entry, ...previous]);
+    setJournalVerse("");
+    setJournalLearning("");
+    setJournalAction("");
+  }
 
   // Save data
   useEffect(() => {
@@ -1098,6 +1201,19 @@ function App() {
                 <span className="feature-link">عرض المحفوظات <ArrowRight size={15} /></span>
               </button>
             </div>
+            <div className="section-heading feature-heading">
+              <div>
+                <span className="section-kicker">رفقة قرآنية يومية</span>
+                <h3>مساحة لقلبك وتدبّرك</h3>
+              </div>
+            </div>
+            <div className="features-grid new-features-grid">
+              <button className="feature-card" onClick={() => changePage("daily")}><div className="feature-icon"><CalendarDays size={23} /></div><h4>آية اليوم</h4><p>آية مختارة ومعنى ميسّر للتأمل.</p><span className="feature-link">اقرأ آية اليوم <ArrowRight size={15} /></span></button>
+              <button className="feature-card" onClick={() => changePage("heart")}><div className="feature-icon"><Heart size={23} /></div><h4>رسالة لقلبك</h4><p>اختر شعورك واكتشف آية تذكّرك بمعنى قرآني.</p><span className="feature-link">افتح المساحة <ArrowRight size={15} /></span></button>
+              <button className="feature-card" onClick={() => changePage("challenge")}><div className="feature-icon"><Gift size={23} /></div><h4>تحدي التطبيق</h4><p>حوّل قيمة قرآنية إلى عمل صغير اليوم.</p><span className="feature-link">ابدأ التحدي <ArrowRight size={15} /></span></button>
+              <button className="feature-card" onClick={() => changePage("journal")}><div className="feature-icon"><PenLine size={23} /></div><h4>بصمتي القرآنية</h4><p>دوّن ما تعلمته وكيف ستطبقه في حياتك.</p><span className="feature-link">اكتب تأملك <ArrowRight size={15} /></span></button>
+              <button className="feature-card" onClick={() => changePage("journey")}><div className="feature-icon"><Map size={23} /></div><h4>خريطة رحلتي</h4><p>تابع القراءة والحفظ والتدبر في مكان واحد.</p><span className="feature-link">شاهد تقدمك <ArrowRight size={15} /></span></button>
+            </div>
           </section>
         )}
 
@@ -2007,6 +2123,55 @@ function App() {
                 إعادة السورة من البداية
               </button>
             </div>
+          </section>
+        )}
+
+        {/* DAILY VERSE */}
+        {active === "daily" && (
+          <section className="page-content feature-page">
+            <div className="page-title-row"><div><span className="section-kicker">وقفة يومية مع كتاب الله</span><h2>آية اليوم</h2><p>آية نتأمل معناها ونحمل أثرها معنا.</p></div><div className="memorize-title-icon"><CalendarDays size={27} /></div></div>
+            <article className="reflection-card daily-card">
+              <span className="reflection-label"><Sparkles size={16} /> {todayDailyVerse.title}</span>
+              {dailyLoading ? <div className="loading-state"><div className="loader" /> جارٍ تحميل الآية...</div> : dailyAyah ? <><p className="feature-ayah">{dailyAyah.text}</p><div className="verse-reference">سورة {dailyAyah.surah?.name || ""} · الآية {dailyAyah.numberInSurah}</div></> : <p className="feature-hint">تعذّر تحميل نص الآية. اتصل بالإنترنت ثم أعد المحاولة.</p>}
+              <div className="meaning-panel"><strong>المعنى الميسّر</strong><p>{todayDailyVerse.meaning}</p><small>هذا تلخيص مبسّط للتأمل، وليس بديلًا عن كتب التفسير المعتمدة.</small></div>
+              <button className="secondary-button" onClick={() => changePage("quran")}><BookOpen size={16} /> انتقل إلى المصحف</button>
+            </article>
+          </section>
+        )}
+
+        {/* HEART MESSAGE */}
+        {active === "heart" && (
+          <section className="page-content feature-page">
+            <div className="page-title-row"><div><span className="section-kicker">رفقًا بقلبك</span><h2>رسالة لقلبك</h2><p>اختر الشعور الأقرب إليك لتجد آية ومعنى للتأمل.</p></div><div className="memorize-title-icon"><Heart size={27} /></div></div>
+            <div className="emotion-grid">{Object.keys(heartGuides).map((emotion) => <button key={emotion} className={`emotion-button ${selectedEmotion === emotion ? "selected" : ""}`} onClick={() => chooseEmotion(emotion)}>{emotion}</button>)}</div>
+            {selectedEmotion && <article className="reflection-card"><span className="reflection-label"><Heart size={16} /> {heartGuides[selectedEmotion].label}</span>{heartLoading ? <div className="loading-state"><div className="loader" /> جارٍ جلب الآية...</div> : heartAyah ? <><p className="feature-ayah">{heartAyah.text}</p><div className="verse-reference">سورة {heartAyah.surah?.name || ""} · الآية {heartAyah.numberInSurah}</div></> : null}<div className="meaning-panel"><strong>وقفة للتأمل</strong><p>{heartGuides[selectedEmotion].meaning}</p><strong>خطوة لطيفة</strong><p>{heartGuides[selectedEmotion].action}</p></div><p className="feature-hint">هذه مساحة للتذكير والتأمل فقط، وليست تشخيصًا نفسيًا أو علاجًا أو فتوى. عند الحاجة، اطلب دعم شخص مختص أو موثوق.</p></article>}
+          </section>
+        )}
+
+        {/* DAILY CHALLENGE */}
+        {active === "challenge" && (
+          <section className="page-content feature-page">
+            <div className="page-title-row"><div><span className="section-kicker">الإيمان قول وعمل</span><h2>تحدي التطبيق</h2><p>خطوة عملية صغيرة مستوحاة من قيمة إسلامية.</p></div><div className="memorize-title-icon"><Gift size={27} /></div></div>
+            <article className="reflection-card challenge-card"><span className="reflection-label"><Sparkles size={16} /> قيمة اليوم: {todayChallenge.value}</span><h3>{todayChallenge.title}</h3><p>{todayChallenge.description}</p><button className="primary-button" disabled={Boolean(challengeDone[todayKey()])} onClick={() => setChallengeDone((old) => ({ ...old, [todayKey()]: true }))}>{challengeDone[todayKey()] ? <><CircleCheck size={18} /> أنجزت تحدي اليوم</> : <><Check size={18} /> أتممت التحدي</>}</button><p className="feature-hint">اختر ما تستطيع فعله بصدق وإخلاص، ولا تجعل التحدي عبئًا عليك.</p></article>
+          </section>
+        )}
+
+        {/* QURAN JOURNAL */}
+        {active === "journal" && (
+          <section className="page-content feature-page">
+            <div className="page-title-row"><div><span className="section-kicker">أثر القرآن في يومك</span><h2>بصمتي القرآنية</h2><p>سجّل وقفتك مع آية وما تريد تطبيقه في حياتك.</p></div><div className="memorize-title-icon"><PenLine size={27} /></div></div>
+            <form className="reflection-card journal-form" onSubmit={saveReflection}><label>الآية أو السورة (اختياري)<input value={journalVerse} onChange={(e) => setJournalVerse(e.target.value)} placeholder="مثال: سورة العصر، الآية ٢" /></label><label>ماذا تعلمت اليوم؟<textarea value={journalLearning} onChange={(e) => setJournalLearning(e.target.value)} rows={3} placeholder="اكتب المعنى أو الفائدة التي لامست قلبك..." /></label><label>كيف سأطبق ذلك؟<textarea value={journalAction} onChange={(e) => setJournalAction(e.target.value)} rows={3} placeholder="خطوة عملية ألتزم بها..." /></label><button className="primary-button" type="submit" disabled={!journalLearning.trim() && !journalAction.trim()}><Send size={17} /> احفظ بصمتي</button></form>
+            <div className="section-heading"><div><span className="section-kicker">ذكريات التدبر</span><h3>تأملاتي السابقة ({journalEntries.length})</h3></div></div>
+            {journalEntries.length ? <div className="journal-list">{journalEntries.map((entry) => <article className="journal-entry" key={entry.id}><div className="journal-entry-top"><strong>{entry.verse || "وقفة قرآنية"}</strong><span>{entry.date}</span></div>{entry.learning && <p><b>ما تعلمته:</b> {entry.learning}</p>}{entry.action && <p><b>تطبيقي:</b> {entry.action}</p>}<button className="text-button" onClick={() => setJournalEntries((items) => items.filter((item) => item.id !== entry.id))}>حذف هذه الوقفة</button></article>)}</div> : <div className="empty-state">لم تسجل أي تأمل بعد. ابدأ بأول وقفة قرآنية.</div>}
+          </section>
+        )}
+
+        {/* JOURNEY MAP */}
+        {active === "journey" && (
+          <section className="page-content feature-page">
+            <div className="page-title-row"><div><span className="section-kicker">كل خطوة لها أثر</span><h2>خريطة رحلتي</h2><p>نظرة على ما أنجزته في القراءة والحفظ والتدبر.</p></div><div className="memorize-title-icon"><Map size={27} /></div></div>
+            <div className="journey-map"><div className="journey-node"><span className="journey-node-icon"><BookOpen size={22} /></span><div><strong>القراءة</strong><p>{readSurahsCount} سورة قرأتها</p></div><span className="journey-count">{Object.keys(readingHistory).length} يوم نشاط</span></div><div className="journey-line" /><div className="journey-node"><span className="journey-node-icon gold-node"><Brain size={22} /></span><div><strong>الحفظ</strong><p>{memorizedAyahs.length} آية محفوظة</p></div><span className="journey-count">{progress}% من القرآن</span></div><div className="journey-line" /><div className="journey-node"><span className="journey-node-icon"><Sparkles size={22} /></span><div><strong>التدبر</strong><p>{journalEntries.length} وقفة مسجلة</p></div><span className="journey-count">{journalEntries.length} تأمل</span></div><div className="journey-line" /><div className="journey-node"><span className="journey-node-icon gold-node"><Gift size={22} /></span><div><strong>التطبيق</strong><p>{Object.values(challengeDone).filter(Boolean).length} تحديات مكتملة</p></div><span className="journey-count">عمل وقيمة</span></div></div>
+            <div className="progress-card"><div className="progress-top"><div><span className="section-kicker">إجمالي الحفظ</span><h3>استمر ولو بالقليل</h3></div><div className="progress-percent">{progress}%</div></div><div className="progress-track"><div className="progress-fill" style={{ width: `${progress}%` }} /></div><div className="progress-bottom"><span>{memorizedAyahs.length.toLocaleString("ar")} آية</span><span>٦٢٣٦ آية</span></div></div>
           </section>
         )}
 

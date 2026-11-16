@@ -2212,3 +2212,119 @@ button:focus-visible, input:focus-visible {
     justify-content: center;
   }
 }
+/* =====================================
+   HIFDHI - Quran reflection features
+   Midnight Blue / Silver / Gold
+===================================== */
+.feature-page { padding-bottom: 35px; }
+.reflection-card, .journal-form, .journey-map {
+  padding: 25px;
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  background: linear-gradient(145deg, rgba(25, 41, 68, .94), rgba(13, 25, 45, .96));
+  box-shadow: 0 14px 35px rgba(0,0,0,.12);
+}
+.reflection-label { display: inline-flex; align-items: center; gap: 8px; color: var(--gold); font-size: 12px; font-weight: 800; }
+.feature-ayah { margin: 25px 0 12px; color: #f0f4fb; font: 30px/2.1 'Amiri', serif; text-align: center; }
+.verse-reference { color: #c2cede; text-align: center; font-size: 12px; padding-bottom: 18px; border-bottom: 1px solid var(--border); }
+.meaning-panel { margin: 20px 0; padding: 17px; border: 1px solid rgba(214,190,137,.2); border-radius: 13px; background: rgba(197,166,108,.06); }
+.meaning-panel strong { display: block; color: #e2c98e; font-size: 13px; margin: 4px 0 7px; }
+.meaning-panel p { color: #d2dbea; font-size: 13px; line-height: 2; margin: 0 0 10px; }
+.meaning-panel small, .feature-hint { color: #8998b1; font-size: 10px; line-height: 1.9; }
+.emotion-grid { display: grid; grid-template-columns: repeat(5, minmax(0,1fr)); gap: 10px; margin-bottom: 18px; }
+.emotion-button { padding: 14px 8px; border: 1px solid var(--border); border-radius: 12px; background: rgba(25,41,68,.8); color: #dce5f2; font: inherit; cursor: pointer; }
+.emotion-button:hover, .emotion-button.selected { border-color: rgba(214,190,137,.65); color: #f0dba9; background: rgba(197,166,108,.12); }
+.challenge-card { text-align: center; padding: 38px 25px; }
+.challenge-card h3 { color: #f0f4fb; font: 27px 'Amiri',serif; margin: 18px 0 8px; }
+.challenge-card > p:not(.feature-hint) { color: #c2cede; font-size: 14px; line-height: 2; max-width: 570px; margin: 0 auto 24px; }
+.journal-form { display: grid; gap: 16px; }
+.journal-form label { display: grid; gap: 8px; color: #dce5f2; font-size: 12px; font-weight: 700; }
+.journal-form input, .journal-form textarea { width: 100%; box-sizing: border-box; padding: 13px 14px; border: 1px solid var(--border); border-radius: 10px; outline: 0; background: rgba(5,13,27,.45); color: #edf2fa; font: inherit; font-size: 12px; resize: vertical; }
+.journal-form input:focus, .journal-form textarea:focus { border-color: rgba(214,190,137,.65); }
+.journal-form input::placeholder, .journal-form textarea::placeholder { color: #71819a; }
+.journal-form .primary-button { justify-self: start; }
+.journal-list { display: grid; gap: 12px; }
+.journal-entry { padding: 17px; border: 1px solid var(--border); border-radius: 13px; background: rgba(20,34,58,.8); }
+.journal-entry-top { display: flex; justify-content: space-between; gap: 10px; color: #e6edf7; font-size: 12px; }
+.journal-entry-top span { color: #8998b1; font-size: 10px; }
+.journal-entry p { color: #b9c7da; font-size: 12px; line-height: 1.9; white-space: pre-wrap; }
+.journal-entry p b { color: #d7c18e; }
+.journey-map { max-width: 760px; margin: 0 auto; }
+.journey-node { display: flex; align-items: center; gap: 14px; }
+.journey-node-icon { width: 48px; height: 48px; display: grid; place-items: center; flex: 0 0 auto; color: #dce6f4; border: 1px solid var(--border); border-radius: 14px; background: rgba(183,201,226,.09); }
+.journey-node-icon.gold-node { color: #d7bd85; background: rgba(197,166,108,.1); }
+.journey-node strong { color: #edf2fa; font-size: 14px; }
+.journey-node p { color: #8998b1; font-size: 11px; margin: 4px 0 0; }
+.journey-count { margin-right: auto; color: #c7d3e4; font-size: 11px; text-align: left; }
+.journey-line { width: 1px; height: 25px; margin: 4px 23px; background: linear-gradient(#b7c9df,rgba(183,201,223,.08)); }
+@media (max-width: 700px) {
+  .emotion-grid { grid-template-columns: repeat(3, minmax(0,1fr)); }
+  .reflection-card, .journal-form, .journey-map { padding: 17px; }
+  .feature-ayah { font-size: 24px; line-height: 2; }
+  .journey-node { gap: 9px; }
+  .journey-node-icon { width: 40px; height: 40px; }
+  .journey-count { font-size: 9px; }
+}
+@media (max-width: 430px) {
+  .emotion-grid { grid-template-columns: repeat(2, minmax(0,1fr)); }
+  .journey-count { display: none; }
+}
+
+/* تحسين بطاقات السور وأزرارها */
+.surah-card {
+  display: flex;
+  align-items: stretch;
+  gap: 0;
+  padding: 0;
+  overflow: hidden;
+}
+
+.surah-card-open {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  padding: 13px;
+  color: #e5ebf5;
+  background: transparent;
+  border: 0;
+  text-align: right;
+  font-family: inherit;
+}
+
+.surah-card-open:hover {
+  background: rgba(176, 197, 226, .08);
+}
+
+.surah-download-button {
+  width: 43px;
+  flex: 0 0 43px;
+  display: grid;
+  place-items: center;
+  color: #c5d2e4;
+  background: rgba(176, 196, 223, .06);
+  border: 0;
+  border-right: 1px solid var(--border);
+  transition: .2s ease;
+}
+
+.surah-download-button:hover:not(:disabled) {
+  color: var(--gold);
+  background: rgba(197, 166, 108, .12);
+}
+
+.surah-download-button:disabled {
+  color: #a8c9b5;
+  opacity: .8;
+  cursor: default;
+}
+
+/* تحسين الميزات الجديدة */
+.daily-card {
+  margin-top: 15px;
+}
+
+.new-features-grid {
+  margin-top: 12px;
+}
