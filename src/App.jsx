@@ -102,11 +102,11 @@ const heartGuides = {
   "قلق": {
     label: "عندما يزدحم قلبك بالقلق",
     verses: [
-      { surah: 13, ayah: 28 },
-      { surah: 2, ayah: 286 },
-      { surah: 3, ayah: 139 },
-      { surah: 9, ayah: 51 },
-      { surah: 65, ayah: 3 },
+      { surah: 13, ayah: 28, meaning: "تأمل كيف جعل الله ذكره طريقًا لطمأنينة القلب؛ فالسكينة قد تبدأ بذكر صادق وسط انشغال الحياة.", action: "ابتعد قليلًا عن مصدر التشتت، وخذ أنفاسًا هادئة، وردّد ذكرًا تحبه بتأنٍ." },
+      { surah: 2, ayah: 286, meaning: "تذكّرك الآية أن الله يعلم طاقتك، فلا تحمّل نفسك ما لا تطيق، واستعن به في ما صعب عليك.", action: "قسّم ما يقلقك إلى أمور صغيرة، وابدأ بما تستطيع اليوم، واترك ما عجزت عنه لله." },
+      { surah: 3, ayah: 139, meaning: "تدعوك الآية إلى ألا تستسلم للضعف؛ فالتعثر لا يعني أن الطريق انتهى.", action: "اذكر موقفًا تجاوزته من قبل، ثم اختر خطوة عملية صغيرة تعيد إليك الثبات." },
+      { surah: 9, ayah: 51, meaning: "تعلّمك الآية أن ما قدّره الله لا يقع إلا بعلمه، وأن المؤمن يجمع بين الثقة بالله والعمل.", action: "افعل ما تستطيع من أسباب، ثم فوّض النتيجة إلى الله ولا تستنزف قلبك في توقع المجهول." },
+      { surah: 65, ayah: 3, meaning: "تفتح الآية باب الرجاء في كفاية الله لمن يتوكل عليه، مع السعي والأخذ بالأسباب.", action: "حدّد أمرًا خارج سيطرتك، وادعُ الله بشأنه، ثم وجّه جهدك إلى ما يمكنك فعله." },
     ],
     meaning: "تذكّر أن ذكر الله باب للسكينة، وأنك تستطيع أخذ الأسباب مع تفويض ما لا تملك إلى الله.",
     action: "خذ دقيقة هادئة، وردّد ذكرًا تعرفه بتأنٍ، ثم اكتب خطوة صغيرة تستطيع القيام بها الآن.",
@@ -114,11 +114,11 @@ const heartGuides = {
   "حزن": {
     label: "عندما يثقل عليك الحزن",
     verses: [
-      { surah: 94, ayah: 5 },
-      { surah: 94, ayah: 6 },
-      { surah: 12, ayah: 86 },
-      { surah: 2, ayah: 153 },
-      { surah: 39, ayah: 53 },
+      { surah: 94, ayah: 5, meaning: "في الآية وعد بأن مع العسر يسرًا؛ فالشدة ليست الصورة الكاملة لحياتك.", action: "ابحث اليوم عن أمر واحد يخفف عنك، ولو كان راحة قصيرة أو حديثًا مع شخص قريب." },
+      { surah: 94, ayah: 6, meaning: "تكرار الوعد باليسر يثبّت القلب ويذكّره بأن الضيق لا يدوم على حاله.", action: "لا تطلب من نفسك حل كل شيء الآن؛ أنجز خطوة واحدة واترك للغد ما يمكن تأجيله." },
+      { surah: 12, ayah: 86, meaning: "يعقوب عليه السلام بثّ حزنه إلى الله؛ فاللجوء إليه لا ينافي الصبر، بل هو من أبواب الرجاء.", action: "تحدّث إلى الله بدعائك كما أنت، واكتب ما يثقل قلبك إن كان ذلك يعينك على ترتيبه." },
+      { surah: 2, ayah: 153, meaning: "تجمع الآية بين الصبر والصلاة، وتذكّرك أن الاستعانة بالله سند في أوقات الشدة.", action: "صلّ ركعتين إن تيسّر، أو خصص لحظة دعاء هادئة، ثم اطلب دعم من تثق به." },
+      { surah: 39, ayah: 53, meaning: "تذكّرك الآية بسعة رحمة الله، وأن باب الرجوع إليه لا يُغلق في وجه من أقبل عليه.", action: "جدّد نيتك، واستغفر الله، وابدأ عملًا صالحًا صغيرًا دون أن تستسلم لليأس." },
     ],
     meaning: "تذكّر أن القرآن يفتح باب الصبر والرجاء، وأن الضيق ليس نهاية الطريق.",
     action: "امنح نفسك وقتًا، وتواصل مع شخص تثق به، وابدأ بأمر يسير يخفف عنك.",
@@ -126,10 +126,10 @@ const heartGuides = {
   "خوف": {
     label: "عندما تشعر بالخوف",
     verses: [
-      { surah: 3, ayah: 173 },
+      { surah: 3, ayah: 173, meaning: "تبيّن الآية كيف يقوى القلب حين يواجه التخويف بالتوكل والثقة بالله.", action: "قل: حسبنا الله ونعم الوكيل، ثم تعامل مع السبب الواقعي الذي أمامك خطوة خطوة." },
       { surah: 9, ayah: 51 },
-      { surah: 2, ayah: 255 },
-      { surah: 8, ayah: 2 },
+      { surah: 2, ayah: 255, meaning: "تعرّفك آية الكرسي بعظمة الله وكمال قيوميته؛ فتستحضر أن أمرك ليس خارج علمه وقدرته.", action: "اقرأ آية الكرسي بتدبر، ثم اكتب ما يمكنك فعله وما ينبغي أن تفوّضه إلى الله." },
+      { surah: 8, ayah: 2, meaning: "تصف الآية أثر ذكر الله في قلوب المؤمنين؛ فالذكر يعيد للقلب انتباهه إلى ربه.", action: "اقرأ شيئًا من القرآن بهدوء، وتوقف عند معنى يبعث فيك الثقة بالله." },
       { surah: 65, ayah: 3 },
     ],
     meaning: "تذكّرك هذه الآيات بالتوكل على الله، وذكره، والأخذ بالأسباب مع الاستعانة به.",
@@ -139,10 +139,10 @@ const heartGuides = {
     label: "عندما تبحث عن الأمل",
     verses: [
       { surah: 39, ayah: 53 },
-      { surah: 12, ayah: 87 },
+      { surah: 12, ayah: 87, meaning: "تنهى الآية عن القنوط من روح الله، وتفتح نافذة رجاء مهما طال الانتظار.", action: "اختر أمرًا فقدت الأمل فيه، وادعُ الله به، ثم خذ سببًا جديدًا إن كان متاحًا." },
       { surah: 94, ayah: 5 },
-      { surah: 15, ayah: 56 },
-      { surah: 2, ayah: 218 },
+      { surah: 15, ayah: 56, meaning: "تعلّمك الآية أن الرجاء في رحمة الله لا ينقطع، وأن اليأس ليس طريق المؤمن.", action: "استبدل فكرة محبطة بدعاء رجاء، وتذكّر نعمة أو باب خير ما زال مفتوحًا." },
+      { surah: 2, ayah: 218, meaning: "تربط الآية بين الإيمان والهجرة والجهاد في سبيل الله وبين رجاء رحمة الله؛ فالرجاء يصاحبه سعي.", action: "حوّل أمنية واحدة إلى خطوة واضحة، وابدأ بها اليوم ولو كانت بسيطة." },
     ],
     meaning: "تذكّرك هذه الآيات بسعة رحمة الله، وبأن المؤمن لا يقطع رجاءه من رحمته.",
     action: "ابدأ من جديد بخطوة واحدة، ولو كانت صغيرة جدًا، ولا تتردد في طلب المساندة ممن تثق به.",
@@ -150,11 +150,11 @@ const heartGuides = {
   "امتنان": {
     label: "عندما يمتلئ قلبك امتنانًا",
     verses: [
-      { surah: 14, ayah: 7 },
-      { surah: 16, ayah: 18 },
-      { surah: 2, ayah: 152 },
-      { surah: 31, ayah: 12 },
-      { surah: 55, ayah: 13 },
+      { surah: 14, ayah: 7, meaning: "تذكّرك الآية بوعد الله بالزيادة لمن يشكر؛ والشكر يوقظ القلب لرؤية النعم.", action: "اشكر الله على نعمة محددة، واستعملها اليوم في خير أو في نفع إنسان." },
+      { surah: 16, ayah: 18, meaning: "تذكّرك الآية أن نعم الله أكثر من أن تُحصى؛ فكل يوم يحمل أسبابًا جديدة للحمد.", action: "لاحظ ثلاث نعم حولك الآن، وعبّر عن شكرك لله بقول أو عمل." },
+      { surah: 2, ayah: 152, meaning: "تدعوك الآية إلى ذكر الله وشكره؛ فالذكر صلة متجددة، والشكر اعتراف بالفضل.", action: "خصص دقائق لذكر الله، ثم اشكر شخصًا أحسن إليك بكلمة صادقة." },
+      { surah: 31, ayah: 12, meaning: "تربط الآية الحكمة بالشكر، وتذكّرك أن ثمرة الشكر تعود على النفس.", action: "اختر نعمة تستخدمها كثيرًا، وفكّر كيف توظفها اليوم فيما يرضي الله." },
+      { surah: 55, ayah: 13, meaning: "يتكرر السؤال في سورة الرحمن ليوقظ القلب إلى نعم الله الظاهرة والخفية.", action: "تأمل نعمة اعتدت وجودها، واذكر الله حمدًا عليها، ولا تؤجل شكر من كان سببًا فيها." },
     ],
     meaning: "الشكر اعتراف بالنعمة بالقلب واللسان والعمل، وتذكير باستعمال النعم في الخير.",
     action: "اكتب ثلاث نعم، واختر نعمة واحدة تشكر الله عليها بعمل صالح.",
@@ -238,6 +238,7 @@ function App() {
   const [dailyLoading, setDailyLoading] = useState(false);
   const [selectedEmotion, setSelectedEmotion] = useState("");
   const [heartAyah, setHeartAyah] = useState(null);
+  const [heartReflection, setHeartReflection] = useState(null);
   const [heartLoading, setHeartLoading] = useState(false);
   const [challengeDone, setChallengeDone] = useState(() => readStorage("hifdhi-challenge-done", {}));
   const [journalEntries, setJournalEntries] = useState(() => readStorage("hifdhi-reflections", []));
@@ -283,6 +284,7 @@ function App() {
 
     setSelectedEmotion(emotion);
     setHeartAyah(null);
+    setHeartReflection(selectedVerse);
     setHeartLoading(true);
 
     const previousKey = heartLastAyahRef.current[emotion];
@@ -1193,29 +1195,29 @@ function App() {
             </div>
 
             <div className="stats-grid">
-              <div className="stat-card">
+              <button type="button" className="stat-card" onClick={() => changePage("quran")} aria-label="افتح القرآن الكريم">
                 <div className="stat-icon blue"><BookOpen size={21} /></div>
                 <div className="stat-number">{readSurahsCount}</div>
                 <div className="stat-label">سور قرأتها</div>
-              </div>
+              </button>
 
-              <div className="stat-card">
+              <button type="button" className="stat-card" onClick={() => changePage("memorize")} aria-label="افتح الحفظ والمراجعة">
                 <div className="stat-icon gold"><Brain size={21} /></div>
                 <div className="stat-number">{memorizedAyahs.length}</div>
                 <div className="stat-label">آيات حفظتها</div>
-              </div>
+              </button>
 
-              <div className="stat-card">
+              <button type="button" className="stat-card" onClick={() => changePage("activity")} aria-label="افتح سجل النشاط">
                 <div className="stat-icon purple"><Flame size={21} /></div>
                 <div className="stat-number">{getActivityStreak()}</div>
                 <div className="stat-label">أيام متتالية</div>
-              </div>
+              </button>
 
-              <div className="stat-card">
+              <button type="button" className="stat-card" onClick={() => changePage("saved")} aria-label="افتح الآيات المحفوظة">
                 <div className="stat-icon silver"><Bookmark size={21} /></div>
                 <div className="stat-number">{savedAyahs.length}</div>
                 <div className="stat-label">آيات محفوظة للرجوع</div>
-              </div>
+              </button>
             </div>
 
             <div className="progress-card">
@@ -2219,7 +2221,7 @@ function App() {
           <section className="page-content feature-page">
             <div className="page-title-row"><div><span className="section-kicker">رفقًا بقلبك</span><h2>رسالة لقلبك</h2><p>اختر الشعور الأقرب إليك لتجد آية ومعنى للتأمل.</p></div><div className="memorize-title-icon"><Heart size={27} /></div></div>
             <div className="emotion-grid">{Object.keys(heartGuides).map((emotion) => <button key={emotion} className={`emotion-button ${selectedEmotion === emotion ? "selected" : ""}`} onClick={() => chooseEmotion(emotion)}>{emotion}</button>)}</div>
-            {selectedEmotion && <article className="reflection-card"><span className="reflection-label"><Heart size={16} /> {heartGuides[selectedEmotion].label}</span>{heartLoading ? <div className="loading-state"><div className="loader" /> جارٍ جلب الآية...</div> : heartAyah ? <><p className="feature-ayah">{heartAyah.text}</p><div className="verse-reference">سورة {heartAyah.surah?.name || ""} · الآية {heartAyah.numberInSurah}</div></> : null}<div className="meaning-panel"><strong>وقفة للتأمل</strong><p>{heartGuides[selectedEmotion].meaning}</p><strong>خطوة لطيفة</strong><p>{heartGuides[selectedEmotion].action}</p></div><p className="feature-hint">هذه مساحة للتذكير والتأمل فقط، وليست تشخيصًا نفسيًا أو علاجًا أو فتوى. عند الحاجة، اطلب دعم شخص مختص أو موثوق.</p></article>}
+            {selectedEmotion && <article className="reflection-card"><span className="reflection-label"><Heart size={16} /> {heartGuides[selectedEmotion].label}</span>{heartLoading ? <div className="loading-state"><div className="loader" /> جارٍ جلب الآية...</div> : heartAyah ? <><p className="feature-ayah">{heartAyah.text}</p><div className="verse-reference">سورة {heartAyah.surah?.name || ""} · الآية {heartAyah.numberInSurah}</div></> : null}<div className="meaning-panel"><strong>وقفة للتأمل</strong><p>{heartReflection?.meaning || heartGuides[selectedEmotion].meaning}</p><strong>خطوة لطيفة</strong><p>{heartReflection?.action || heartGuides[selectedEmotion].action}</p></div><p className="feature-hint">هذه مساحة للتذكير والتأمل فقط، وليست تشخيصًا نفسيًا أو علاجًا أو فتوى. عند الحاجة، اطلب دعم شخص مختص أو موثوق.</p></article>}
           </section>
         )}
 
@@ -2238,6 +2240,50 @@ function App() {
             <form className="reflection-card journal-form" onSubmit={saveReflection}><label>الآية أو السورة (اختياري)<input value={journalVerse} onChange={(e) => setJournalVerse(e.target.value)} placeholder="مثال: سورة العصر، الآية ٢" /></label><label>ماذا تعلمت اليوم؟<textarea value={journalLearning} onChange={(e) => setJournalLearning(e.target.value)} rows={3} placeholder="اكتب المعنى أو الفائدة التي لامست قلبك..." /></label><label>كيف سأطبق ذلك؟<textarea value={journalAction} onChange={(e) => setJournalAction(e.target.value)} rows={3} placeholder="خطوة عملية ألتزم بها..." /></label><button className="primary-button" type="submit" disabled={!journalLearning.trim() && !journalAction.trim()}><Send size={17} /> احفظ بصمتي</button></form>
             <div className="section-heading"><div><span className="section-kicker">ذكريات التدبر</span><h3>تأملاتي السابقة ({journalEntries.length})</h3></div></div>
             {journalEntries.length ? <div className="journal-list">{journalEntries.map((entry) => <article className="journal-entry" key={entry.id}><div className="journal-entry-top"><strong>{entry.verse || "وقفة قرآنية"}</strong><span>{entry.date}</span></div>{entry.learning && <p><b>ما تعلمته:</b> {entry.learning}</p>}{entry.action && <p><b>تطبيقي:</b> {entry.action}</p>}<button className="text-button" onClick={() => setJournalEntries((items) => items.filter((item) => item.id !== entry.id))}>حذف هذه الوقفة</button></article>)}</div> : <div className="empty-state">لم تسجل أي تأمل بعد. ابدأ بأول وقفة قرآنية.</div>}
+          </section>
+        )}
+
+        {/* ACTIVITY HISTORY */}
+        {active === "activity" && (
+          <section className="page-content feature-page">
+            <div className="page-title-row">
+              <div>
+                <span className="section-kicker">مواظبتك مع القرآن</span>
+                <h2>سجل النشاط</h2>
+                <p>كل يوم اقتربت فيه من القرآن هو خطوة تستحق التقدير.</p>
+              </div>
+              <div className="memorize-title-icon"><Flame size={27} /></div>
+            </div>
+            <div className="progress-card">
+              <div className="progress-top">
+                <div><span className="section-kicker">استمرارية الرحلة</span><h3>أيام النشاط المسجلة</h3></div>
+                <div className="progress-percent">{Object.keys(readingHistory).length}</div>
+              </div>
+              <p>سلسلتك الحالية: {getActivityStreak()} أيام متتالية</p>
+            </div>
+            {Object.keys(readingHistory).length ? (
+              <div className="journal-list">
+                {Object.entries(readingHistory).sort(([a], [b]) => b.localeCompare(a)).map(([date, day]) => (
+                  <article className="journal-entry" key={date}>
+                    <div className="journal-entry-top">
+                      <strong>{new Date(`${date}T12:00:00`).toLocaleDateString("ar", { weekday: "long", year: "numeric", month: "long", day: "numeric" })}</strong>
+                      <span>{(day.surahs || []).length} سورة</span>
+                    </div>
+                    <p>{(day.surahs || []).map((number) => {
+                      const found = surahs.find((item) => getSurahNumber(item) === Number(number));
+                      return found ? getSurahName(found) : `سورة رقم ${number}`;
+                    }).join("، ") || "تم تسجيل نشاط قرآني"}</p>
+                  </article>
+                ))}
+              </div>
+            ) : (
+              <div className="empty-card">
+                <div className="empty-icon"><Flame size={32} /></div>
+                <h3>لم يُسجّل نشاط بعد</h3>
+                <p>ابدأ بقراءة سورة أو مراجعة حفظك، وسيظهر نشاطك هنا تلقائيًا.</p>
+                <button className="primary-button" onClick={() => changePage("quran")}><BookOpen size={17} /> ابدأ القراءة</button>
+              </div>
+            )}
           </section>
         )}
 
