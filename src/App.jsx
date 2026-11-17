@@ -99,11 +99,66 @@ const dailyVerses = [
 ];
 
 const heartGuides = {
-  "قلق": { label: "عندما يزدحم قلبك بالقلق", surah: 13, ayah: 28, meaning: "تذكّر أن ذكر الله باب للسكينة، وخذ بالأسباب مع تفويض ما لا تملك إلى الله.", action: "خذ دقيقة هادئة، وردّد ذكرًا تعرفه بتأنٍ، ثم اكتب خطوة صغيرة تستطيع القيام بها الآن." },
-  "حزن": { label: "عندما يثقل عليك الحزن", surah: 94, ayah: 5, meaning: "تذكّر وعد الله بأن مع العسر يسرًا، وأن الضيق ليس نهاية الطريق.", action: "امنح نفسك وقتًا، وتواصل مع شخص تثق به، وابدأ بأمر يسير يخفف عنك." },
-  "خوف": { label: "عندما تشعر بالخوف", surah: 3, ayah: 173, meaning: "تدعونا الآية إلى التوكل على الله والثقة بأنه نعم الوكيل.", action: "سمِّ ما تخافه بوضوح، وخذ بالأسباب الممكنة، واستعن بالله في ما لا تستطيع التحكم فيه." },
-  "أمل": { label: "عندما تبحث عن الأمل", surah: 39, ayah: 53, meaning: "لا يغلق الله باب رحمته في وجه من يرجع إليه؛ فلا تجعل التعثر سببًا لليأس.", action: "ابدأ من جديد بخطوة واحدة، ولو كانت صغيرة جدًا." },
-  "امتنان": { label: "عندما يمتلئ قلبك امتنانًا", surah: 14, ayah: 7, meaning: "الشكر اعتراف بالنعمة بالقلب واللسان والعمل، وهو سبب للزيادة والبركة.", action: "اكتب ثلاث نعم، واختر نعمة واحدة تشكر الله عليها بعمل صالح." },
+  "قلق": {
+    label: "عندما يزدحم قلبك بالقلق",
+    verses: [
+      { surah: 13, ayah: 28 },
+      { surah: 2, ayah: 286 },
+      { surah: 3, ayah: 139 },
+      { surah: 9, ayah: 51 },
+      { surah: 65, ayah: 3 },
+    ],
+    meaning: "تذكّر أن ذكر الله باب للسكينة، وأنك تستطيع أخذ الأسباب مع تفويض ما لا تملك إلى الله.",
+    action: "خذ دقيقة هادئة، وردّد ذكرًا تعرفه بتأنٍ، ثم اكتب خطوة صغيرة تستطيع القيام بها الآن.",
+  },
+  "حزن": {
+    label: "عندما يثقل عليك الحزن",
+    verses: [
+      { surah: 94, ayah: 5 },
+      { surah: 94, ayah: 6 },
+      { surah: 12, ayah: 86 },
+      { surah: 2, ayah: 153 },
+      { surah: 39, ayah: 53 },
+    ],
+    meaning: "تذكّر أن القرآن يفتح باب الصبر والرجاء، وأن الضيق ليس نهاية الطريق.",
+    action: "امنح نفسك وقتًا، وتواصل مع شخص تثق به، وابدأ بأمر يسير يخفف عنك.",
+  },
+  "خوف": {
+    label: "عندما تشعر بالخوف",
+    verses: [
+      { surah: 3, ayah: 173 },
+      { surah: 9, ayah: 51 },
+      { surah: 2, ayah: 255 },
+      { surah: 8, ayah: 2 },
+      { surah: 65, ayah: 3 },
+    ],
+    meaning: "تذكّرك هذه الآيات بالتوكل على الله، وذكره، والأخذ بالأسباب مع الاستعانة به.",
+    action: "سمِّ ما تخافه بوضوح، وخذ بالأسباب الممكنة، واستعن بالله فيما لا تستطيع التحكم فيه.",
+  },
+  "أمل": {
+    label: "عندما تبحث عن الأمل",
+    verses: [
+      { surah: 39, ayah: 53 },
+      { surah: 12, ayah: 87 },
+      { surah: 94, ayah: 5 },
+      { surah: 15, ayah: 56 },
+      { surah: 2, ayah: 218 },
+    ],
+    meaning: "تذكّرك هذه الآيات بسعة رحمة الله، وبأن المؤمن لا يقطع رجاءه من رحمته.",
+    action: "ابدأ من جديد بخطوة واحدة، ولو كانت صغيرة جدًا، ولا تتردد في طلب المساندة ممن تثق به.",
+  },
+  "امتنان": {
+    label: "عندما يمتلئ قلبك امتنانًا",
+    verses: [
+      { surah: 14, ayah: 7 },
+      { surah: 16, ayah: 18 },
+      { surah: 2, ayah: 152 },
+      { surah: 31, ayah: 12 },
+      { surah: 55, ayah: 13 },
+    ],
+    meaning: "الشكر اعتراف بالنعمة بالقلب واللسان والعمل، وتذكير باستعمال النعم في الخير.",
+    action: "اكتب ثلاث نعم، واختر نعمة واحدة تشكر الله عليها بعمل صالح.",
+  },
 };
 
 const dailyChallenges = [
@@ -219,13 +274,33 @@ function App() {
     return () => { cancelled = true; };
   }, []);
 
+  // نتذكر آخر آية ظهرت لكل شعور حتى لا تتكرر مباشرة عند الضغط مرة أخرى.
+  const heartLastAyahRef = useRef({});
+
   async function chooseEmotion(emotion) {
+    const guide = heartGuides[emotion];
+    if (!guide?.verses?.length) return;
+
     setSelectedEmotion(emotion);
     setHeartAyah(null);
     setHeartLoading(true);
+
+    const previousKey = heartLastAyahRef.current[emotion];
+    const availableVerses = guide.verses.filter(
+      (verse) => `${verse.surah}:${verse.ayah}` !== previousKey
+    );
+    const choices = availableVerses.length ? availableVerses : guide.verses;
+    const selectedVerse = choices[Math.floor(Math.random() * choices.length)];
+    const selectedKey = `${selectedVerse.surah}:${selectedVerse.ayah}`;
+
+    // نحفظ الاختيار قبل جلبه حتى لا نعيد اختياره في الضغطة التالية.
+    heartLastAyahRef.current[emotion] = selectedKey;
+
     try {
-      const guide = heartGuides[emotion];
-      const data = await fetchFeatureAyah(guide.surah, guide.ayah);
+      const data = await fetchFeatureAyah(
+        selectedVerse.surah,
+        selectedVerse.ayah
+      );
       setHeartAyah(data);
     } catch (error) {
       setOfflineMessage(error.message);
