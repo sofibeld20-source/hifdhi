@@ -1196,11 +1196,18 @@ function App() {
             </div>
 
             <div className="stats-grid">
-              <button type="button" className="stat-card" onClick={() => changePage("quran")} aria-label="افتح القرآن الكريم">
-                <div className="stat-icon blue"><BookOpen size={21} /></div>
-                <div className="stat-number">{readSurahsCount}</div>
-                <div className="stat-label">سور قرأتها</div>
-              </button>
+            <button
+  type="button"
+  className="stat-card"
+  onClick={() => {
+    alert("CLICK WORKS!");
+    changePage("quran");
+  }}
+>
+  <div className="stat-icon blue"><BookOpen size={21} /></div>
+  <div className="stat-number">{readSurahsCount}</div>
+  <div className="stat-label">سور قرأتها</div>
+</button>
 
               <button type="button" className="stat-card" onClick={() => changePage("memorize")} aria-label="افتح الحفظ والمراجعة">
                 <div className="stat-icon gold"><Brain size={21} /></div>
