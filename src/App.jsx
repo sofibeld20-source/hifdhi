@@ -27,6 +27,7 @@ const menu = [
   { id: "smart", label: "الحفظ الذكي", icon: Zap },
   { id: "listen", label: "الاستماع", icon: Headphones },
   { id: "saved", label: "الآيات المحفوظة", icon: Bookmark },
+  { id: "activity", label: "سجل النشاط", icon: Flame },
   { id: "daily", label: "آية اليوم", icon: CalendarDays },
   { id: "heart", label: "رسالة لقلبك", icon: Heart },
   { id: "challenge", label: "تحدي التطبيق", icon: Gift },
@@ -282,11 +283,6 @@ function App() {
     const guide = heartGuides[emotion];
     if (!guide?.verses?.length) return;
 
-    setSelectedEmotion(emotion);
-    setHeartAyah(null);
-    setHeartReflection(selectedVerse);
-    setHeartLoading(true);
-
     const previousKey = heartLastAyahRef.current[emotion];
     const availableVerses = guide.verses.filter(
       (verse) => `${verse.surah}:${verse.ayah}` !== previousKey
@@ -295,8 +291,13 @@ function App() {
     const selectedVerse = choices[Math.floor(Math.random() * choices.length)];
     const selectedKey = `${selectedVerse.surah}:${selectedVerse.ayah}`;
 
-    // نحفظ الاختيار قبل جلبه حتى لا نعيد اختياره في الضغطة التالية.
+    // نحفظ الاختيار قبل جلب الآية حتى لا تتكرر مباشرة.
     heartLastAyahRef.current[emotion] = selectedKey;
+
+    setSelectedEmotion(emotion);
+    setHeartAyah(null);
+    setHeartReflection(selectedVerse);
+    setHeartLoading(true);
 
     try {
       const data = await fetchFeatureAyah(
