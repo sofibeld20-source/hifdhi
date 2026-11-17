@@ -450,11 +450,22 @@ button:focus-visible, input:focus-visible {
 }
 
 .stat-card {
+  width: 100%;
   min-height: 137px;
   padding: 17px;
   border: 1px solid var(--border);
   border-radius: 15px;
   background: linear-gradient(145deg, rgba(25, 41, 68, .9), rgba(15, 27, 48, .9));
+  color: #e8edf7;
+  font-family: inherit;
+  font-size: inherit;
+  text-align: right;
+  cursor: pointer;
+  appearance: none;
+  -webkit-appearance: none;
+  position: relative;
+  z-index: 1;
+  pointer-events: auto;
   transition: .2s ease;
 }
 
