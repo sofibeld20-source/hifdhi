@@ -1199,10 +1199,8 @@ function App() {
             <button
   type="button"
   className="stat-card"
-  onClick={() => {
-    alert("CLICK WORKS!");
-    changePage("quran");
-  }}
+  onClick={() => changePage("quran")}
+  aria-label="افتح القرآن الكريم"
 >
   <div className="stat-icon blue"><BookOpen size={21} /></div>
   <div className="stat-number">{readSurahsCount}</div>
