@@ -1165,7 +1165,11 @@ function App() {
 
                 <button
                   className="primary-button"
-                  onClick={() => changePage("quran")}
+                 onClick={() => {
+  console.log("STAT CARD CLICKED");
+  alert("CLICK WORKS!");
+  changePage("quran");
+}}
                 >
                   <BookOpen size={18} />
                   ابدأ القراءة
