@@ -46,6 +46,45 @@ const reciters = [
   { id: "ar.minshawi", name: "محمد صديق المنشاوي" },
 ];
 
+const learningProfiles = [
+  {
+    id: "child",
+    title: "وضع الطفل",
+    english: "KIDS MODE",
+    description: "رحلة قرآنية ممتعة مليئة بالتشجيع والإنجازات الصغيرة.",
+    details: "واجهة بسيطة، ألوان مبهجة، ونجوم تحفّزك على الاستمرار.",
+    icon: Gift,
+    accent: "مرح ومليء بالألوان",
+  },
+  {
+    id: "student",
+    title: "وضع الطالب",
+    english: "STUDENT MODE",
+    description: "نظّم وقتك، حدّد أهدافك، وتابع تقدمك خطوة بخطوة.",
+    details: "أهداف يومية وأسبوعية، جدول واضح، وإحصائيات لتقدمك.",
+    icon: GraduationCap,
+    accent: "منظم وعصري",
+  },
+  {
+    id: "hafiz",
+    title: "وضع الحافظ",
+    english: "HAFIZ MODE",
+    description: "ثبّت ما حفظته واعتنِ بمراجعتك القرآنية المتقدمة.",
+    details: "مراجعة منظمة، متابعة الآيات المحفوظة، وسجل التقدم.",
+    icon: BookOpen,
+    accent: "هادئ وراقٍ",
+  },
+  {
+    id: "teacher",
+    title: "وضع الأستاذ",
+    english: "TEACHER MODE",
+    description: "مساحة مخصصة لمتابعة المتعلمين وتنظيم العمل التعليمي.",
+    details: "هذا الوضع الآن واجهة تعريفية؛ صلاحيات إدارة الطلاب ستُبنى لاحقاً.",
+    icon: Brain,
+    accent: "احترافي وواضح",
+  },
+];
+
 const readStorage = (key, fallback) => {
   try {
     const value = localStorage.getItem(key);
@@ -188,6 +227,9 @@ const dailyChallenges = [
 ];
 
 function App() {
+  const [profile, setProfile] = useState(() =>
+    readStorage("hifdhi-learning-profile", null)
+  );
   const [active, setActive] = useState("home");
   const [authOpen, setAuthOpen] = useState(false);
 const [authEmail, setAuthEmail] = useState("");
@@ -1252,8 +1294,67 @@ function completeScheduledReview(isDifficult = false) {
         )
       : `سورة رقم ${smartSurah}`;
 
+  function chooseLearningProfile(selectedProfile) {
+    setProfile(selectedProfile);
+    localStorage.setItem(
+      "hifdhi-learning-profile",
+      JSON.stringify(selectedProfile)
+    );
+  }
+
+  if (!profile) {
+    return (
+      <div className="profile-onboarding" dir="rtl">
+        <div className="profile-onboarding-glow profile-glow-one" />
+        <div className="profile-onboarding-glow profile-glow-two" />
+        <div className="profile-onboarding-inner">
+          <div className="profile-brand">
+            <span className="profile-brand-icon"><BookOpen size={27} /></span>
+            <span>
+              <strong>حِفْظِي</strong>
+              <small>HIFDHI · رحلتك مع القرآن</small>
+            </span>
+          </div>
+
+          <div className="profile-intro">
+            <span className="profile-eyebrow"><Sparkles size={15} /> تجربة قرآنية تناسبك</span>
+            <h1>كيف تحب أن تعيش رحلتك مع القرآن؟</h1>
+            <p>اختر الوضع المناسب لك، وسنخصص تجربتك وواجهة التطبيق حسب احتياجاتك.</p>
+          </div>
+
+          <div className="profile-grid">
+            {learningProfiles.map((item) => {
+              const Icon = item.icon;
+              return (
+                <button
+                  type="button"
+                  className={`profile-choice profile-choice-${item.id}`}
+                  key={item.id}
+                  onClick={() => chooseLearningProfile(item)}
+                >
+                  <span className="profile-choice-top">
+                    <span className="profile-choice-icon"><Icon size={27} /></span>
+                    <span className="profile-choice-en">{item.english}</span>
+                  </span>
+                  <strong>{item.title}</strong>
+                  <span className="profile-choice-description">{item.description}</span>
+                  <span className="profile-choice-details">{item.details}</span>
+                  <span className="profile-choice-action">اختيار هذا الوضع <ArrowRight size={16} /></span>
+                </button>
+              );
+            })}
+          </div>
+
+          <p className="profile-footnote">
+            يمكنك تغيير اختيارك لاحقاً. بيانات الحفظ والمراجعة الحالية تبقى محفوظة.
+          </p>
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <div className="app" dir="rtl">
+    <div className="app" data-theme={profile.id} dir="rtl">
       {mobileMenu && (
         <button
           className="mobile-overlay"
@@ -1282,6 +1383,28 @@ function completeScheduledReview(isDifficult = false) {
             <X size={20} />
           </button>
         </div>
+
+        <button
+          type="button"
+          className="profile-switch-button"
+          onClick={() => {
+            setProfile(null);
+            localStorage.removeItem("hifdhi-learning-profile");
+            setMobileMenu(false);
+          }}
+        >
+          <span className="profile-switch-icon">
+            {(() => {
+              const CurrentIcon = profile.icon || GraduationCap;
+              return <CurrentIcon size={17} />;
+            })()}
+          </span>
+          <span>
+            <small>الوضع الحالي</small>
+            <strong>{profile.title}</strong>
+          </span>
+          <RefreshCw size={15} className="profile-switch-refresh" />
+        </button>
 
         <div className="sidebar-label">القائمة الرئيسية</div>
 

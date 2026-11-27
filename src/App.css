@@ -2670,3 +2670,456 @@ button:focus-visible, input:focus-visible {
   opacity: 0.6;
   cursor: not-allowed;
 }
+
+
+
+/* =========================================
+   HIFDHI ADAPTIVE — PROFILE SELECTION
+========================================= */
+
+.profile-onboarding {
+  --profile-text: #edf3fc;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  overflow: hidden;
+  padding: 56px 24px;
+  color: var(--profile-text);
+  background:
+    radial-gradient(circle at 12% 12%, rgba(77, 112, 164, .22), transparent 28%),
+    radial-gradient(circle at 90% 85%, rgba(91, 77, 145, .17), transparent 30%),
+    #080f20;
+}
+
+.profile-onboarding-inner {
+  position: relative;
+  z-index: 1;
+  width: min(100%, 1050px);
+  margin: auto;
+}
+
+.profile-onboarding-glow {
+  position: absolute;
+  width: 340px;
+  height: 340px;
+  border-radius: 50%;
+  filter: blur(95px);
+  opacity: .17;
+  pointer-events: none;
+}
+
+.profile-glow-one {
+  top: -190px;
+  right: 12%;
+  background: #6489bd;
+}
+
+.profile-glow-two {
+  bottom: -220px;
+  left: 8%;
+  background: #8b78c7;
+}
+
+.profile-brand {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  margin-bottom: 48px;
+  text-align: right;
+}
+
+.profile-brand-icon {
+  display: grid;
+  width: 49px;
+  height: 49px;
+  place-items: center;
+  color: #14213a;
+  border-radius: 15px;
+  background: linear-gradient(145deg, #f0f4fb, #aebdd2);
+}
+
+.profile-brand strong,
+.profile-brand small {
+  display: block;
+}
+
+.profile-brand strong {
+  color: #f0f4fb;
+  font-size: 23px;
+  line-height: 1.2;
+}
+
+.profile-brand small {
+  margin-top: 4px;
+  color: #91a1ba;
+  font-size: 10px;
+}
+
+.profile-intro {
+  max-width: 680px;
+  margin: 0 auto 32px;
+  text-align: center;
+}
+
+.profile-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 7px 12px;
+  color: #c4d4e9;
+  border: 1px solid rgba(190, 207, 231, .17);
+  border-radius: 30px;
+  background: rgba(190, 207, 231, .06);
+  font-size: 11px;
+}
+
+.profile-eyebrow svg {
+  color: #d7bd82;
+}
+
+.profile-intro h1 {
+  margin: 17px 0 9px;
+  color: #f0f4fb;
+  font-family: 'Amiri', serif;
+  font-size: clamp(28px, 4vw, 43px);
+  line-height: 1.5;
+}
+
+.profile-intro p {
+  margin: 0;
+  color: #98a8c0;
+  font-size: 13px;
+  line-height: 2;
+}
+
+.profile-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.profile-choice {
+  position: relative;
+  display: flex;
+  min-height: 235px;
+  flex-direction: column;
+  align-items: stretch;
+  padding: 23px;
+  overflow: hidden;
+  color: #edf3fc;
+  text-align: right;
+  border: 1px solid rgba(190, 207, 231, .15);
+  border-radius: 19px;
+  background: linear-gradient(145deg, rgba(25, 41, 68, .94), rgba(12, 23, 41, .97));
+  cursor: pointer;
+  transition: transform .22s ease, border-color .22s ease, box-shadow .22s ease;
+}
+
+.profile-choice::after {
+  position: absolute;
+  content: "";
+  width: 150px;
+  height: 150px;
+  left: -65px;
+  bottom: -85px;
+  border-radius: 50%;
+  background: var(--profile-accent, rgba(177, 197, 224, .12));
+  filter: blur(15px);
+  opacity: .5;
+  pointer-events: none;
+}
+
+.profile-choice:hover {
+  transform: translateY(-4px);
+  border-color: var(--profile-border, rgba(205, 220, 241, .45));
+  box-shadow: 0 16px 38px rgba(0, 0, 0, .2);
+}
+
+.profile-choice:focus-visible {
+  outline: 2px solid #dce8f8;
+  outline-offset: 4px;
+}
+
+.profile-choice-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 17px;
+}
+
+.profile-choice-icon {
+  display: grid;
+  width: 49px;
+  height: 49px;
+  place-items: center;
+  color: var(--profile-color, #d6e2f1);
+  border: 1px solid var(--profile-border, rgba(190, 207, 231, .2));
+  border-radius: 15px;
+  background: var(--profile-tint, rgba(190, 207, 231, .09));
+}
+
+.profile-choice-en {
+  color: #8d9db5;
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 1.5px;
+}
+
+.profile-choice > strong {
+  margin-bottom: 6px;
+  color: #f0f4fb;
+  font-size: 19px;
+}
+
+.profile-choice-description {
+  color: #b4c1d4;
+  font-size: 11px;
+  line-height: 1.9;
+}
+
+.profile-choice-details {
+  margin-top: 7px;
+  color: #8494ad;
+  font-size: 10px;
+  line-height: 1.8;
+}
+
+.profile-choice-action {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  margin-top: auto;
+  padding-top: 17px;
+  color: var(--profile-color, #d6e2f1);
+  font-size: 11px;
+  font-weight: 800;
+}
+
+.profile-choice-child {
+  --profile-color: #f2c66d;
+  --profile-border: rgba(242, 198, 109, .3);
+  --profile-tint: rgba(242, 198, 109, .1);
+  --profile-accent: rgba(242, 198, 109, .24);
+}
+
+.profile-choice-student {
+  --profile-color: #9bc7f0;
+  --profile-border: rgba(123, 177, 226, .3);
+  --profile-tint: rgba(123, 177, 226, .1);
+  --profile-accent: rgba(123, 177, 226, .24);
+}
+
+.profile-choice-hafiz {
+  --profile-color: #9bd4b5;
+  --profile-border: rgba(105, 185, 139, .3);
+  --profile-tint: rgba(105, 185, 139, .1);
+  --profile-accent: rgba(105, 185, 139, .24);
+}
+
+.profile-choice-teacher {
+  --profile-color: #c2b5f0;
+  --profile-border: rgba(158, 139, 220, .3);
+  --profile-tint: rgba(158, 139, 220, .1);
+  --profile-accent: rgba(158, 139, 220, .24);
+}
+
+.profile-footnote {
+  margin: 23px 0 0;
+  color: #74849d;
+  font-size: 10px;
+  text-align: center;
+  line-height: 1.8;
+}
+
+.profile-switch-button {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  margin-top: 18px;
+  padding: 11px;
+  color: #c7d4e6;
+  text-align: right;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: rgba(181, 198, 223, .045);
+  cursor: pointer;
+}
+
+.profile-switch-button:hover {
+  background: rgba(181, 198, 223, .09);
+}
+
+.profile-switch-icon {
+  display: grid;
+  width: 34px;
+  height: 34px;
+  flex: 0 0 auto;
+  place-items: center;
+  color: var(--theme-accent, #c5d5e9);
+  border-radius: 10px;
+  background: var(--theme-accent-bg, rgba(181, 198, 223, .1));
+}
+
+.profile-switch-button > span:nth-child(2) {
+  display: grid;
+  flex: 1;
+  gap: 2px;
+}
+
+.profile-switch-button small {
+  color: #8494ad;
+  font-size: 9px;
+}
+
+.profile-switch-button strong {
+  color: #e8edf7;
+  font-size: 11px;
+}
+
+.profile-switch-refresh {
+  color: #8494ad;
+}
+
+/* Role-specific accent systems. The existing HIFDHI layout and saved data stay intact. */
+
+.app[data-theme="child"] {
+  --theme-accent: #f2c66d;
+  --theme-accent-bg: rgba(242, 198, 109, .13);
+  --gold: #f2c66d;
+}
+
+.app[data-theme="child"] .sidebar {
+  background: linear-gradient(180deg, #26345a 0%, #17213d 100%);
+}
+
+.app[data-theme="child"] .hero {
+  background:
+    radial-gradient(circle at 77% 50%, rgba(255, 205, 112, .2), transparent 26%),
+    linear-gradient(112deg, #344c79 0%, #25375d 57%, #192747 100%);
+}
+
+.app[data-theme="child"] .brand-icon,
+.app[data-theme="child"] .primary-button {
+  color: #382b16;
+  background: linear-gradient(135deg, #ffe5a3, #f2bd5d);
+}
+
+.app[data-theme="child"] .nav-item.active {
+  color: #fff4d9;
+  background: rgba(242, 198, 109, .13);
+  border-color: rgba(242, 198, 109, .25);
+  box-shadow: inset -3px 0 0 #f2c66d;
+}
+
+.app[data-theme="child"] .nav-item.active svg,
+.app[data-theme="child"] .nav-active-dot {
+  color: #f2c66d;
+  background: #f2c66d;
+}
+
+.app[data-theme="student"] {
+  --theme-accent: #9bc7f0;
+  --theme-accent-bg: rgba(123, 177, 226, .12);
+}
+
+.app[data-theme="hafiz"] {
+  --theme-accent: #9bd4b5;
+  --theme-accent-bg: rgba(105, 185, 139, .12);
+  --gold: #d8bd79;
+}
+
+.app[data-theme="hafiz"] .sidebar {
+  background: linear-gradient(180deg, #12382f 0%, #0b241f 100%);
+}
+
+.app[data-theme="hafiz"] .hero {
+  background:
+    radial-gradient(circle at 77% 50%, rgba(125, 196, 151, .19), transparent 26%),
+    linear-gradient(112deg, #1d5141 0%, #14392f 57%, #0c2922 100%);
+}
+
+.app[data-theme="hafiz"] .brand-icon,
+.app[data-theme="hafiz"] .primary-button {
+  color: #12352a;
+  background: linear-gradient(135deg, #d9eddf, #91c5a5);
+}
+
+.app[data-theme="hafiz"] .nav-item.active {
+  color: #e2f4e8;
+  background: rgba(105, 185, 139, .13);
+  border-color: rgba(105, 185, 139, .25);
+  box-shadow: inset -3px 0 0 #83c59b;
+}
+
+.app[data-theme="hafiz"] .nav-item.active svg,
+.app[data-theme="hafiz"] .nav-active-dot {
+  color: #9bd4b5;
+  background: #9bd4b5;
+}
+
+.app[data-theme="teacher"] {
+  --theme-accent: #c2b5f0;
+  --theme-accent-bg: rgba(158, 139, 220, .13);
+}
+
+.app[data-theme="teacher"] .sidebar {
+  background: linear-gradient(180deg, #292348 0%, #191630 100%);
+}
+
+.app[data-theme="teacher"] .hero {
+  background:
+    radial-gradient(circle at 77% 50%, rgba(177, 156, 235, .2), transparent 26%),
+    linear-gradient(112deg, #403765 0%, #2c254b 57%, #1d1a36 100%);
+}
+
+.app[data-theme="teacher"] .brand-icon,
+.app[data-theme="teacher"] .primary-button {
+  color: #29213e;
+  background: linear-gradient(135deg, #e6defb, #b8a9e7);
+}
+
+.app[data-theme="teacher"] .nav-item.active {
+  color: #eee9ff;
+  background: rgba(158, 139, 220, .14);
+  border-color: rgba(158, 139, 220, .27);
+  box-shadow: inset -3px 0 0 #b8a9e7;
+}
+
+.app[data-theme="teacher"] .nav-item.active svg,
+.app[data-theme="teacher"] .nav-active-dot {
+  color: #c2b5f0;
+  background: #c2b5f0;
+}
+
+@media (max-width: 700px) {
+  .profile-onboarding {
+    align-items: flex-start;
+    padding: 32px 16px;
+  }
+
+  .profile-brand {
+    margin-bottom: 32px;
+  }
+
+  .profile-grid {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .profile-choice {
+    min-height: 205px;
+    padding: 19px;
+  }
+
+  .profile-intro {
+    margin-bottom: 24px;
+  }
+
+  .profile-intro p {
+    font-size: 11px;
+  }
+}
