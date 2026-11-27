@@ -1317,8 +1317,7 @@ function completeScheduledReview(isDifficult = false) {
 
   if (!profile) {
     return (
-      <div className="profile-onboarding" dir="rtl">
-        <div className="profile-onboarding-glow profile-glow-one" />
+<div className="profile-onboarding welcome-page" dir="rtl">        <div className="profile-onboarding-glow profile-glow-one" />
         <div className="profile-onboarding-glow profile-glow-two" />
         <div className="profile-onboarding-inner">
           <div className="profile-brand">
