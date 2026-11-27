@@ -1,14 +1,17 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
+
 import {
   BookOpen, Brain, Headphones, Home, Search, Bookmark,
   Flame, Target, ChevronLeft, Menu, X, Sparkles, Moon,
   BookmarkCheck, ArrowRight, Play, Check, RotateCcw,
   Volume2, CircleCheck, GraduationCap, Eye, EyeOff,
-  Lightbulb, Trophy, Zap, Download, Wifi, WifiOff, Heart, PenLine, Map, Gift, CalendarDays, Send, RefreshCw
+  Lightbulb, Trophy, Zap, Download, Wifi, WifiOff, Heart,
+  PenLine, Map, Gift, CalendarDays, Send, RefreshCw
 } from "lucide-react";
-import "./App.css";
 
+import "./App.css";
+import { supabase } from "./supabase";
 import {
   saveSurahOffline,
   getSurahOffline,
@@ -21,6 +24,7 @@ const API = "https://ummahapi.com/api";
 const TOTAL_AYAHS = 6236;
 
 const menu = [
+  { id: "review", label: "مراجعتي اليوم", icon: CalendarDays },
   { id: "home", label: "الرئيسية", icon: Home },
   { id: "quran", label: "القرآن الكريم", icon: BookOpen },
   { id: "memorize", label: "الحفظ والمراجعة", icon: Brain },
@@ -53,6 +57,17 @@ const readStorage = (key, fallback) => {
 
 const todayKey = () => new Date().toLocaleDateString("en-CA");
 
+function dateAfterDays(days) {
+  const date = new Date();
+  date.setHours(12, 0, 0, 0);
+  date.setDate(date.getDate() + days);
+
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+
+  return `${year}-${month}-${day}`;
+}
 function getSurahName(surah) {
   return (
     surah?.name_arabic ||
@@ -174,6 +189,11 @@ const dailyChallenges = [
 
 function App() {
   const [active, setActive] = useState("home");
+  const [authOpen, setAuthOpen] = useState(false);
+const [authEmail, setAuthEmail] = useState("");
+const [authPassword, setAuthPassword] = useState("");
+const [authLoading, setAuthLoading] = useState(false);
+const [authMessage, setAuthMessage] = useState("");
   const [mobileMenu, setMobileMenu] = useState(false);
   const [search, setSearch] = useState("");
 
@@ -195,6 +215,15 @@ function App() {
   const [memorizedAyahs, setMemorizedAyahs] = useState(
     () => readStorage("hifdhi-memorized", [])
   );
+  // Smart Review
+const [reviewSchedule, setReviewSchedule] = useState(
+  () => readStorage("hifdhi-review-schedule", {})
+);
+
+const [reviewCurrent, setReviewCurrent] = useState(null);
+const [reviewAyah, setReviewAyah] = useState(null);
+const [reviewLoading, setReviewLoading] = useState(false);
+const [showReviewAnswer, setShowReviewAnswer] = useState(false);
 
   const [savedAyahs, setSavedAyahs] = useState(
     () => readStorage("hifdhi-saved", [])
@@ -332,6 +361,41 @@ function App() {
   useEffect(() => {
     localStorage.setItem("hifdhi-memorized", JSON.stringify(memorizedAyahs));
   }, [memorizedAyahs]);
+  // Save review schedule
+useEffect(() => {
+  localStorage.setItem(
+    "hifdhi-review-schedule",
+    JSON.stringify(reviewSchedule)
+  );
+}, [reviewSchedule]);
+
+// Add previously memorized ayahs to the review system
+useEffect(() => {
+  setReviewSchedule((previous) => {
+    const updated = { ...previous };
+    let changed = false;
+
+    memorizedAyahs.forEach((key) => {
+      if (updated[key]) return;
+
+      const [surahNumber, ayahNumber] = key.split(":").map(Number);
+
+      if (!surahNumber || !ayahNumber) return;
+
+      updated[key] = {
+        key,
+        surahNumber,
+        ayahNumber,
+        dueDate: todayKey(),
+        intervalDays: 0,
+      };
+
+      changed = true;
+    });
+
+    return changed ? updated : previous;
+  });
+}, [memorizedAyahs]);
 
   useEffect(() => {
     localStorage.setItem("hifdhi-saved", JSON.stringify(savedAyahs));
@@ -668,7 +732,20 @@ function App() {
       ayah?.number || ayah?.number_in_surah || index + 1
     );
     const key = `${surahNumber}:${ayahNumber}`;
+setReviewSchedule((previous) => {
+  if (previous[key]) return previous;
 
+  return {
+    ...previous,
+    [key]: {
+      key,
+      surahNumber,
+      ayahNumber,
+      dueDate: dateAfterDays(1),
+      intervalDays: 1,
+    },
+  };
+});
     setMemorizedAyahs((previous) => {
       if (previous.includes(key)) return previous;
       return [...previous, key];
@@ -709,9 +786,26 @@ function App() {
     const ayah = practiceAyahs[practiceIndex];
     if (!ayah) return;
 
-    const key = `${practiceSurah}:${Number(
-      ayah.number || ayah.number_in_surah || practiceIndex + 1
-    )}`;
+   const ayahNumber = Number(
+  ayah.number || ayah.number_in_surah || practiceIndex + 1
+);
+const surahNumber = Number(practiceSurah);
+const key = `${surahNumber}:${ayahNumber}`;
+
+setReviewSchedule((previous) => {
+  if (previous[key]) return previous;
+
+  return {
+    ...previous,
+    [key]: {
+      key,
+      surahNumber,
+      ayahNumber,
+      dueDate: dateAfterDays(1),
+      intervalDays: 1,
+    },
+  };
+});
 
     setMemorizedAyahs((previous) =>
       previous.includes(key) ? previous : [...previous, key]
@@ -821,7 +915,22 @@ function App() {
     );
 
     const key = `${smartSurah}:${ayahNumber}`;
+    const surahNumber = Number(smartSurah);
 
+setReviewSchedule((previous) => {
+  if (previous[key]) return previous;
+
+  return {
+    ...previous,
+    [key]: {
+      key,
+      surahNumber,
+      ayahNumber,
+      dueDate: dateAfterDays(1),
+      intervalDays: 1,
+    },
+  };
+});
     setSmartFinishedAyahs((previous) =>
       previous.includes(key) ? previous : [...previous, key]
     );
@@ -844,10 +953,86 @@ function App() {
   }
 
   function restartSmartPractice() {
+    
     setSmartIndex(0);
     setRevealedWords([]);
   }
+// Smart Review System
+const dueReviews = useMemo(() => {
+  return Object.values(reviewSchedule)
+    .filter((item) => item.dueDate <= todayKey())
+    .sort((a, b) => a.dueDate.localeCompare(b.dueDate));
+}, [reviewSchedule]);
 
+const futureReviewsCount = Object.values(reviewSchedule).filter(
+  (item) => item.dueDate > todayKey()
+).length;
+
+async function startScheduledReview(item) {
+  setReviewCurrent(item);
+  setReviewAyah(null);
+  setShowReviewAnswer(false);
+  setReviewLoading(true);
+  setApiError("");
+
+  try {
+    const verses = await loadSurahVerses(item.surahNumber);
+
+    const verse = verses.find((ayah, index) => {
+      const number = Number(
+        ayah.number || ayah.number_in_surah || index + 1
+      );
+
+      return number === item.ayahNumber;
+    });
+
+    if (!verse) {
+      throw new Error("لم نتمكن من العثور على هذه الآية.");
+    }
+
+    setReviewAyah(verse);
+  } catch (error) {
+    setApiError(error.message || "تعذر تحميل الآية.");
+    setReviewCurrent(null);
+  } finally {
+    setReviewLoading(false);
+  }
+}
+
+function completeScheduledReview(isDifficult = false) {
+  if (!reviewCurrent) return;
+
+  const previousInterval = reviewCurrent.intervalDays || 0;
+
+  let nextInterval;
+
+  if (isDifficult) {
+    nextInterval = 1;
+  } else if (previousInterval <= 0) {
+    nextInterval = 1;
+  } else if (previousInterval <= 1) {
+    nextInterval = 3;
+  } else if (previousInterval <= 3) {
+    nextInterval = 7;
+  } else if (previousInterval <= 7) {
+    nextInterval = 14;
+  } else {
+    nextInterval = 30;
+  }
+
+  setReviewSchedule((previous) => ({
+    ...previous,
+    [reviewCurrent.key]: {
+      ...previous[reviewCurrent.key],
+      dueDate: dateAfterDays(nextInterval),
+      intervalDays: nextInterval,
+    },
+  }));
+
+  setReviewCurrent(null);
+  setReviewAyah(null);
+  setShowReviewAnswer(false);
+}
   // Audio player
   function getListenSurah() {
     return surahs.find(
@@ -1124,6 +1309,12 @@ function App() {
             )}
             {isOnline ? "متصل بالإنترنت" : "وضع دون إنترنت"}
           </div>
+          <button
+  className="login-btn"
+  onClick={() => setAuthOpen(true)}
+>
+  تسجيل الدخول
+</button>
         </header>
 
         {offlineMessage && (
@@ -1163,20 +1354,15 @@ function App() {
                   فهل من مُدَّكِر؟ اجعل لك مع القرآن وردًا لا ينقطع.
                 </p>
 
-                <button
-                  className="primary-button"
-                 onClick={() => {
-  console.log("STAT CARD CLICKED");
-  alert("CLICK WORKS!");
-  changePage("quran");
-}}
-                >
-                  <BookOpen size={18} />
-                  ابدأ القراءة
-                  <ArrowRight size={17} />
-                </button>
-              </div>
-
+               <button
+  className="primary-button"
+  onClick={() => changePage("quran")}
+>
+  <BookOpen size={18} />
+  ابدأ القراءة
+  <ArrowRight size={17} />
+</button>
+</div>
               <div className="hero-decoration">
                 <div className="hero-orbit orbit-one" />
                 <div className="hero-orbit orbit-two" />
@@ -1954,6 +2140,184 @@ function App() {
         )}
 
         {/* SAVED */}
+        {/* SMART REVIEW */}
+{active === "review" && (
+  <section className="page-content">
+    <div className="page-title-row">
+      <div>
+        <span className="section-kicker">ثبّتي ما حفظتِ</span>
+        <h2>مراجعتي اليوم</h2>
+        <p>آياتك المستحقة للمراجعة، في الوقت المناسب.</p>
+      </div>
+
+      <div className="memorize-title-icon">
+        <CalendarDays size={27} />
+      </div>
+    </div>
+
+    <div className="smart-stats">
+      <div className="smart-stat-card">
+        <Target size={20} />
+        <strong>{dueReviews.length}</strong>
+        <span>مراجعات اليوم</span>
+      </div>
+
+      <div className="smart-stat-card">
+        <CalendarDays size={20} />
+        <strong>{futureReviewsCount}</strong>
+        <span>مراجعات قادمة</span>
+      </div>
+
+      <div className="smart-stat-card">
+        <BookmarkCheck size={20} />
+        <strong>{Object.keys(reviewSchedule).length}</strong>
+        <span>آيات في البرنامج</span>
+      </div>
+    </div>
+
+    {reviewCurrent ? (
+      <div className="practice-card">
+        <div className="practice-card-top">
+          <div>
+            <span className="section-kicker">جلسة المراجعة</span>
+            <h3>
+              {surahs.find(
+                (s) => getSurahNumber(s) === reviewCurrent.surahNumber
+              )
+                ? getSurahName(
+                    surahs.find(
+                      (s) => getSurahNumber(s) === reviewCurrent.surahNumber
+                    )
+                  )
+                : `سورة رقم ${reviewCurrent.surahNumber}`}
+            </h3>
+          </div>
+
+          <button
+            className="back-button"
+            onClick={() => {
+              setReviewCurrent(null);
+              setReviewAyah(null);
+              setShowReviewAnswer(false);
+            }}
+          >
+            رجوع
+          </button>
+        </div>
+
+        <div className="practice-progress">
+          <span>الآية رقم {reviewCurrent.ayahNumber}</span>
+        </div>
+
+        <div className="practice-ayah-box">
+          {reviewLoading ? (
+            <div className="loading-state">
+              <div className="loader" />
+              جارٍ تحميل الآية...
+            </div>
+          ) : showReviewAnswer && reviewAyah ? (
+            <p className="practice-ayah-text">
+              {getAyahText(reviewAyah)}
+            </p>
+          ) : (
+            <div className="hidden-answer">
+              <Brain size={30} />
+              <h4>اختبري ذاكرتك</h4>
+              <p>حاولي تذكّر الآية قبل إظهارها.</p>
+            </div>
+          )}
+        </div>
+
+        {!showReviewAnswer && !reviewLoading && (
+          <button
+            className="primary-button"
+            onClick={() => setShowReviewAnswer(true)}
+            disabled={!reviewAyah}
+          >
+            <Eye size={17} />
+            إظهار الآية
+          </button>
+        )}
+
+        {showReviewAnswer && reviewAyah && (
+          <div className="practice-actions">
+            <button
+              className="secondary-button"
+              onClick={() => completeScheduledReview(true)}
+            >
+              <RotateCcw size={17} />
+              كانت صعبة عليّ
+            </button>
+
+            <button
+              className="primary-button"
+              onClick={() => completeScheduledReview(false)}
+            >
+              <Check size={17} />
+              راجعتها بنجاح
+            </button>
+          </div>
+        )}
+      </div>
+    ) : dueReviews.length > 0 ? (
+      <div className="practice-start-card">
+        <div className="practice-start-icon">
+          <Brain size={36} />
+        </div>
+
+        <h3>لديكِ {dueReviews.length} آية للمراجعة</h3>
+        <p>اختاري آية وابدئي مراجعتها. بالتوفيق!</p>
+
+        <div className="practice-surah-list">
+          {dueReviews.map((item) => {
+            const surah = surahs.find(
+              (s) => getSurahNumber(s) === item.surahNumber
+            );
+
+            return (
+              <button
+                className="practice-surah-option"
+                key={item.key}
+                onClick={() => startScheduledReview(item)}
+              >
+                <span className="surah-number">
+                  {item.surahNumber}
+                </span>
+
+                <strong>
+                  {getSurahName(surah)} · الآية {item.ayahNumber}
+                </strong>
+
+                <ArrowRight size={16} />
+              </button>
+            );
+          })}
+        </div>
+      </div>
+    ) : (
+      <div className="empty-card">
+        <div className="empty-icon">
+          <CircleCheck size={32} />
+        </div>
+
+        <h3>ما شاء الله! لا توجد مراجعات مستحقة اليوم.</h3>
+        <p>
+          {futureReviewsCount > 0
+            ? `لديكِ ${futureReviewsCount} مراجعة قادمة. واصلي الحفظ والمراجعة.`
+            : "علّمي آية كمحفوظة، وسنضيفها تلقائيًا إلى برنامج المراجعة."}
+        </p>
+
+        <button
+          className="primary-button"
+          onClick={() => changePage("memorize")}
+        >
+          <Brain size={17} />
+          اذهبي إلى الحفظ
+        </button>
+      </div>
+    )}
+  </section>
+)}
         {active === "saved" && (
           <section className="page-content">
             <div className="page-title-row">
@@ -2305,7 +2669,82 @@ function App() {
             <div className="progress-card"><div className="progress-top"><div><span className="section-kicker">إجمالي الحفظ</span><h3>استمر ولو بالقليل</h3></div><div className="progress-percent">{progress}%</div></div><div className="progress-track"><div className="progress-fill" style={{ width: `${progress}%` }} /></div><div className="progress-bottom"><span>{memorizedAyahs.length.toLocaleString("ar")} آية</span><span>٦٢٣٦ آية</span></div></div>
           </section>
         )}
+        {authOpen && (
+          <div className="auth-overlay">
+            <div className="auth-modal">
+              <button
+                className="auth-close"
+                onClick={() => setAuthOpen(false)}
+              >
+                <X size={20} />
+              </button>
 
+              <h2>مرحبًا بك في حِفْظِي</h2>
+              <p>سجّلي الدخول لمزامنة بياناتك بين أجهزتك.</p>
+
+              <form onSubmit={async (e) => {
+                e.preventDefault();
+                setAuthLoading(true);
+                setAuthMessage("");
+
+                const { error } = await supabase.auth.signInWithPassword({
+                  email: authEmail,
+                  password: authPassword,
+                });
+
+                setAuthMessage(
+                  error ? error.message : "تم تسجيل الدخول بنجاح."
+                );
+                setAuthLoading(false);
+              }}>
+                <input
+                  type="email"
+                  placeholder="البريد الإلكتروني"
+                  value={authEmail}
+                  onChange={(e) => setAuthEmail(e.target.value)}
+                  required
+                />
+
+                <input
+                  type="password"
+                  placeholder="كلمة المرور"
+                  value={authPassword}
+                  onChange={(e) => setAuthPassword(e.target.value)}
+                  required
+                />
+
+                <button type="submit" disabled={authLoading}>
+                  {authLoading ? "جارٍ الدخول..." : "تسجيل الدخول"}
+                </button>
+              </form>
+
+              <button
+                className="auth-signup"
+                disabled={authLoading}
+                onClick={async () => {
+                  setAuthLoading(true);
+                  setAuthMessage("");
+
+                  const { error } = await supabase.auth.signUp({
+                    email: authEmail,
+                    password: authPassword,
+                  });
+
+                  setAuthMessage(
+                    error
+                      ? error.message
+                      : "تم إنشاء الحساب. تحققي من بريدك الإلكتروني لتأكيده."
+                  );
+                  setAuthLoading(false);
+                }}
+              >
+                إنشاء حساب جديد
+              </button>
+
+              {authMessage && <p>{authMessage}</p>}
+            </div>
+          </div>
+        )}
         <footer className="app-footer">
           <span>حِفْظِي · HIFDHI</span>
           <span>اللهم اجعل القرآن ربيع قلوبنا</span>
