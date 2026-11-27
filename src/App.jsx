@@ -227,9 +227,19 @@ const dailyChallenges = [
 ];
 
 function App() {
-  const [profile, setProfile] = useState(() =>
-    readStorage("hifdhi-learning-profile", null)
+ const [profile, setProfile] = useState(() => {
+  const savedProfile = readStorage("hifdhi-learning-profile", null);
+
+  if (!savedProfile) return null;
+
+  const originalProfile = learningProfiles.find(
+    (item) => item.id === savedProfile.id
   );
+
+  return originalProfile
+    ? { ...originalProfile, ...savedProfile, icon: originalProfile.icon }
+    : null;
+});
   const [active, setActive] = useState("home");
   const [authOpen, setAuthOpen] = useState(false);
 const [authEmail, setAuthEmail] = useState("");
@@ -1308,12 +1318,19 @@ function completeScheduledReview(isDifficult = false) {
       : `سورة رقم ${smartSurah}`;
 
   function chooseLearningProfile(selectedProfile) {
-    setProfile(selectedProfile);
-    localStorage.setItem(
-      "hifdhi-learning-profile",
-      JSON.stringify(selectedProfile)
-    );
-  }
+  const originalProfile = learningProfiles.find(
+    (item) => item.id === selectedProfile.id
+  );
+
+  if (!originalProfile) return;
+
+  setProfile(originalProfile);
+
+  localStorage.setItem(
+    "hifdhi-learning-profile",
+    JSON.stringify({ id: originalProfile.id })
+  );
+}
 
   if (!profile) {
     return (
@@ -1405,12 +1422,15 @@ function completeScheduledReview(isDifficult = false) {
             setMobileMenu(false);
           }}
         >
-          <span className="profile-switch-icon">
-            {(() => {
-              const CurrentIcon = profile.icon || GraduationCap;
-              return <CurrentIcon size={17} />;
-            })()}
-          </span>
+        <span className="profile-switch-icon">
+  {(() => {
+    const Icon = learningProfiles.find(
+      (item) => item.id === profile.id
+    )?.icon || GraduationCap;
+
+    return <Icon size={17} />;
+  })()}
+</span>
           <span>
             <small>الوضع الحالي</small>
             <strong>{profile.title}</strong>
