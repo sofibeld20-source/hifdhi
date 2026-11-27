@@ -3123,3 +3123,45 @@ button:focus-visible, input:focus-visible {
     font-size: 11px;
   }
 }
+
+
+/* Child Mode dashboard */
+.child-dashboard {
+  padding-bottom: 34px;
+  --child-gold: #f5c96d;
+  --child-pink: #f2a6bd;
+  --child-blue: #9fd5f2;
+}
+.child-welcome-card {
+  min-height: 245px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  padding: 30px 36px;
+  overflow: hidden;
+  position: relative;
+  border: 1px solid rgba(245, 201, 109, .28);
+  border-radius: 24px;
+  background: radial-gradient(circle at 80% 45%, rgba(242, 166, 189, .19), transparent 27%), linear-gradient(115deg, #354875, #27365e 58%, #202c4e);
+  box-shadow: 0 18px 42px rgba(0,0,0,.16);
+}
+.child-welcome-copy { position: relative; z-index: 1; max-width: 650px; }
+.child-eyebrow, .child-section-kicker { display: inline-flex; align-items: center; gap: 7px; color: #ffe2a1; font-size: 11px; font-weight: 800; }
+.child-welcome-card h2 { margin: 12px 0 5px; color: #fff4df; font-size: clamp(25px, 3vw, 36px); }
+.child-welcome-card p { max-width: 550px; margin: 0 0 19px; color: #d7e0f1; font-size: 12px; line-height: 2; }
+.child-main-button, .child-complete-button { display: inline-flex; align-items: center; justify-content: center; gap: 9px; min-height: 43px; padding: 10px 17px; border: 0; border-radius: 12px; color: #49351a; background: linear-gradient(135deg, #ffe7aa, #f4c66a); font: inherit; font-size: 12px; font-weight: 900; cursor: pointer; transition: .2s ease; }
+.child-main-button:hover, .child-complete-button:hover:not(:disabled) { transform: translateY(-2px); filter: brightness(1.05); }
+.child-welcome-art { width: 210px; height: 180px; flex: 0 0 210px; position: relative; display: grid; place-items: center; border: 1px solid rgba(255,255,255,.17); border-radius: 46% 54% 51% 49%; background: rgba(255,255,255,.07); }
+.child-art-book { font-size: 86px; filter: drop-shadow(0 12px 15px rgba(0,0,0,.2)); }
+.child-art-star { position: absolute; color: #ffe6a7; font-size: 32px; }
+.star-a { top: 13px; right: 25px; }.star-b { bottom: 15px; left: 24px; color: #f2b5cb; }
+.child-art-spark { position: absolute; top: 23px; left: 25px; font-size: 23px; }
+.child-stats-grid { display: grid; grid-template-columns: repeat(4, minmax(0,1fr)); gap: 13px; margin-top: 17px; }
+.child-stat-card { min-height: 130px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 5px; border: 1px solid rgba(197,211,233,.15); border-radius: 17px; background: linear-gradient(145deg, rgba(35,51,83,.94), rgba(19,31,55,.96)); }
+.child-stat-icon { font-size: 24px; }.child-stat-card strong { color: #fff0d1; font-size: 25px; line-height: 1.2; }.child-stat-card > span:last-child { color: #aebdd3; font-size: 10px; }.child-stars-card { border-color: rgba(245,201,109,.34); background: linear-gradient(145deg, rgba(76,61,54,.9), rgba(35,37,60,.96)); }
+.child-challenge-card, .child-reward-card { margin-top: 18px; padding: 22px 24px; border: 1px solid rgba(197,211,233,.15); border-radius: 18px; background: linear-gradient(145deg, rgba(31,47,77,.94), rgba(17,29,51,.96)); }
+.child-card-heading { display: flex; align-items: center; gap: 12px; }.child-card-icon { width: 45px; height: 45px; display: grid; place-items: center; border-radius: 14px; background: rgba(245,201,109,.13); font-size: 23px; }.child-card-heading > div { flex: 1; }.child-card-heading > div > span { color: #aebdd3; font-size: 10px; }.child-card-heading h3 { margin: 2px 0 0; color: #f4e9d2; font-size: 17px; }.child-points-pill { padding: 7px 11px; border: 1px solid rgba(245,201,109,.25); border-radius: 20px; color: #ffe2a1; background: rgba(245,201,109,.09); font-size: 11px; font-weight: 800; }.child-challenge-card > p { margin: 15px 0; color: #b7c4d8; font-size: 12px; line-height: 1.9; }.child-complete-button:disabled { color: #cce7d5; background: rgba(116,177,139,.2); cursor: default; }.child-challenge-card > small { display: block; margin-top: 10px; color: #8394af; font-size: 10px; }
+.child-reward-top { display: flex; align-items: center; justify-content: space-between; gap: 12px; }.child-reward-top h3 { margin: 5px 0 0; color: #f1e8d8; font-size: 15px; }.child-reward-trophy { font-size: 34px; }.child-reward-track { height: 10px; margin-top: 19px; overflow: hidden; border-radius: 20px; background: rgba(4,11,23,.6); }.child-reward-track > div { height: 100%; border-radius: inherit; background: linear-gradient(90deg, #e7a7bd, #f6cf78); transition: width .35s ease; }.child-reward-progress-label { display: flex; justify-content: space-between; margin-top: 7px; color: #9eacc2; font-size: 10px; }.child-reward-list { display: grid; grid-template-columns: repeat(4,minmax(0,1fr)); gap: 10px; margin-top: 18px; }.child-reward-item { min-width: 0; display: flex; flex-direction: column; align-items: center; gap: 5px; padding: 12px 6px; border: 1px solid rgba(197,211,233,.12); border-radius: 13px; background: rgba(8,16,31,.25); opacity: .62; }.child-reward-item.unlocked { opacity: 1; border-color: rgba(245,201,109,.3); background: rgba(245,201,109,.08); }.child-reward-item > span { font-size: 23px; }.child-reward-item small { color: #c4cede; font-size: 10px; text-align: center; }.child-reward-item b { color: #f5d38d; font-size: 9px; }.child-quick-actions { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 13px; margin-top: 18px; }.child-quick-actions button { display: flex; flex-direction: column; align-items: flex-start; gap: 6px; padding: 17px; color: #e8edf7; text-align: right; border: 1px solid rgba(197,211,233,.14); border-radius: 15px; background: rgba(25,40,67,.8); cursor: pointer; transition: .2s ease; }.child-quick-actions button:hover { transform: translateY(-2px); border-color: rgba(245,201,109,.3); }.child-quick-actions button > span { font-size: 23px; }.child-quick-actions strong { font-size: 12px; }.child-quick-actions small { color: #91a1ba; font-size: 10px; }
+@media (max-width: 760px) { .child-welcome-card { padding: 24px; }.child-welcome-art { width: 125px; height: 125px; flex-basis: 125px; }.child-art-book { font-size: 57px; }.child-stats-grid { grid-template-columns: repeat(2,minmax(0,1fr)); }.child-reward-list { grid-template-columns: repeat(2,minmax(0,1fr)); } }
+@media (max-width: 520px) { .child-welcome-card { padding: 21px; }.child-welcome-art { display: none; }.child-quick-actions { grid-template-columns: 1fr; }.child-challenge-card, .child-reward-card { padding: 18px; }.child-card-heading h3 { font-size: 15px; } }

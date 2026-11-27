@@ -357,6 +357,19 @@ const [showReviewAnswer, setShowReviewAnswer] = useState(false);
   const todayChallenge = dailyChallenges[Math.floor(new Date().setHours(0,0,0,0) / 86400000) % dailyChallenges.length];
   const todayDailyVerse = dailyVerses[Math.floor(new Date().setHours(0,0,0,0) / 86400000) % dailyVerses.length];
 
+  // Child-mode stars are a lightweight reward layer based on completed daily challenges.
+  const childStars = Object.values(challengeDone).filter(Boolean).length * 10;
+  const childRewards = [
+    { stars: 10, title: "بداية رائعة", icon: "⭐" },
+    { stars: 30, title: "بطل التحديات", icon: "🏅" },
+    { stars: 50, title: "نجم حِفْظِي", icon: "🌟" },
+    { stars: 100, title: "وسام المثابرة", icon: "🏆" },
+  ];
+  const nextChildReward = childRewards.find((reward) => childStars < reward.stars) || null;
+  const childRewardProgress = nextChildReward
+    ? Math.min(100, Math.round((childStars / nextChildReward.stars) * 100))
+    : 100;
+
   useEffect(() => {
     localStorage.setItem("hifdhi-challenge-done", JSON.stringify(challengeDone));
   }, [challengeDone]);
@@ -1504,7 +1517,98 @@ function completeScheduledReview(isDifficult = false) {
         )}
 
         {/* HOME */}
-        {active === "home" && (
+        {active === "home" && profile.id === "child" && (
+          <section className="page-content child-dashboard">
+            <div className="child-welcome-card">
+              <div className="child-welcome-copy">
+                <span className="child-eyebrow"><Sparkles size={15} /> مغامرتك القرآنية</span>
+                <h2>أهلاً يا بطل القرآن! 🌈</h2>
+                <p>كل آية تتعلمها وكل خطوة تقوم بها تقرّبك من هدفك. هيا نبدأ إنجازًا جديدًا اليوم!</p>
+                <button className="child-main-button" onClick={() => changePage("quran")}>
+                  <BookOpen size={18} /> ابدأ القراءة <ArrowRight size={17} />
+                </button>
+              </div>
+              <div className="child-welcome-art" aria-hidden="true">
+                <span className="child-art-star star-a">✦</span>
+                <span className="child-art-star star-b">✧</span>
+                <span className="child-art-book">📖</span>
+                <span className="child-art-spark">✨</span>
+              </div>
+            </div>
+
+            <div className="child-stats-grid">
+              <article className="child-stat-card child-stars-card">
+                <span className="child-stat-icon">⭐</span>
+                <strong>{childStars}</strong>
+                <span>نجوم جمعتها</span>
+              </article>
+              <article className="child-stat-card">
+                <span className="child-stat-icon">📖</span>
+                <strong>{readSurahsCount}</strong>
+                <span>سور قرأتها</span>
+              </article>
+              <article className="child-stat-card">
+                <span className="child-stat-icon">🧠</span>
+                <strong>{memorizedAyahs.length}</strong>
+                <span>آيات حفظتها</span>
+              </article>
+              <article className="child-stat-card">
+                <span className="child-stat-icon">🔥</span>
+                <strong>{getActivityStreak()}</strong>
+                <span>أيام نشاط متتالية</span>
+              </article>
+            </div>
+
+            <div className="child-challenge-card">
+              <div className="child-card-heading">
+                <span className="child-card-icon">🎯</span>
+                <div>
+                  <span>مهمة اليوم</span>
+                  <h3>{todayChallenge.title}</h3>
+                </div>
+                <span className="child-points-pill">+10 ⭐</span>
+              </div>
+              <p>{todayChallenge.description}</p>
+              <button
+                className="child-complete-button"
+                disabled={Boolean(challengeDone[todayKey()])}
+                onClick={() => setChallengeDone((old) => ({ ...old, [todayKey()]: true }))}
+              >
+                {challengeDone[todayKey()] ? <><Check size={18} /> أحسنت! أكملت مهمة اليوم</> : <><Trophy size={18} /> أكملت المهمة</>}
+              </button>
+              <small>اختَر إنجاز المهمة عندما تنتهي منها فعلًا. كل إنجاز يمنحك 10 نجوم.</small>
+            </div>
+
+            <div className="child-reward-card">
+              <div className="child-reward-top">
+                <div>
+                  <span className="child-section-kicker">طريق المكافآت</span>
+                  <h3>{nextChildReward ? `باقي لك ${nextChildReward.stars - childStars} نجمة للمكافأة القادمة` : "رائع! وصلت إلى كل المكافآت"}</h3>
+                </div>
+                <span className="child-reward-trophy">🏆</span>
+              </div>
+              <div className="child-reward-track"><div style={{ width: `${childRewardProgress}%` }} /></div>
+              <div className="child-reward-progress-label"><span>{childStars} نجمة</span><span>{nextChildReward ? `${nextChildReward.stars} نجمة` : "كل المكافآت مفتوحة"}</span></div>
+              <div className="child-reward-list">
+                {childRewards.map((reward) => (
+                  <div className={`child-reward-item ${childStars >= reward.stars ? "unlocked" : ""}`} key={reward.stars}>
+                    <span>{reward.icon}</span>
+                    <small>{reward.title}</small>
+                    <b>{childStars >= reward.stars ? "مفتوحة" : `${reward.stars} ⭐`}</b>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div className="child-quick-actions">
+              <button onClick={() => changePage("memorize")}><span>🧠</span><strong>وقت الحفظ</strong><small>تدرّب على آيات جديدة</small></button>
+              <button onClick={() => changePage("challenge")}><span>🎁</span><strong>تحديات أخرى</strong><small>اكتشف قيمة جديدة</small></button>
+              <button onClick={() => changePage("activity")}><span>🌟</span><strong>إنجازاتي</strong><small>شاهد رحلتك وتقدمك</small></button>
+            </div>
+          </section>
+        )}
+
+        {active === "home" && profile.id !== "child" && (
           <section className="page-content">
             <div className="hero">
               <div className="hero-content">
