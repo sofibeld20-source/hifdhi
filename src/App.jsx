@@ -194,6 +194,42 @@ const [authEmail, setAuthEmail] = useState("");
 const [authPassword, setAuthPassword] = useState("");
 const [authLoading, setAuthLoading] = useState(false);
 const [authMessage, setAuthMessage] = useState("");
+const [user, setUser] = useState(null);
+
+useEffect(() => {
+  let mounted = true;
+
+  supabase.auth.getSession().then(({ data: { session } }) => {
+    if (mounted) {
+      setUser(session?.user ?? null);
+    }
+  });
+
+  const {
+    data: { subscription },
+  } = supabase.auth.onAuthStateChange((_event, session) => {
+    setUser(session?.user ?? null);
+  });
+
+  return () => {
+    mounted = false;
+    subscription.unsubscribe();
+  };
+}, []);
+const [authUser, setAuthUser] = useState(null);
+
+useEffect(() => {
+  supabase.auth.getSession().then(({ data: { session } }) => {
+    setAuthUser(session?.user ?? null);
+  });
+
+  const { data: { subscription } } =
+    supabase.auth.onAuthStateChange((_event, session) => {
+      setAuthUser(session?.user ?? null);
+    });
+
+  return () => subscription.unsubscribe();
+}, []);
   const [mobileMenu, setMobileMenu] = useState(false);
   const [search, setSearch] = useState("");
 
@@ -1309,11 +1345,17 @@ function completeScheduledReview(isDifficult = false) {
             )}
             {isOnline ? "متصل بالإنترنت" : "وضع دون إنترنت"}
           </div>
-          <button
+         <button
   className="login-btn"
-  onClick={() => setAuthOpen(true)}
+  onClick={() => {
+    if (user) {
+      supabase.auth.signOut();
+    } else {
+      setAuthOpen(true);
+    }
+  }}
 >
-  تسجيل الدخول
+  {user ? "تسجيل الخروج" : "تسجيل الدخول"}
 </button>
         </header>
 
